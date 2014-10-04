@@ -1,5 +1,6 @@
 package cmpe226.project1.schema1.data;
 
+
 import java.util.Date;
 
 import javax.persistence.Column;
