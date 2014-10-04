@@ -1,5 +1,6 @@
 package cmpe226.project1.github.schema1.model;
 
+import java.util.Collection;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -8,9 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -20,10 +19,10 @@ public class Repository {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "repo_id", updatable = false, nullable = false)
 	private long id;
-	
-	@ManyToOne
-	@JoinColumn(name="actor_id")
-	private Actor owner;
+
+	@OneToMany
+	@JoinColumn(name="repo_id")
+	private Collection<Event> events;
 	
 	private String name;
 	private String html_url;
@@ -47,18 +46,7 @@ public class Repository {
 	public void setId(long id) {
 		this.id = id;
 	}
-	public Actor getOwner() {
-		return owner;
-	}
-	public void setOwner(Actor owner) {
-		this.owner = owner;
-	}
-	public Event getEvent() {
-		return event;
-	}
-	public void setEvent(Event event) {
-		this.event = event;
-	}
+	
 	public String getName() {
 		return name;
 	}

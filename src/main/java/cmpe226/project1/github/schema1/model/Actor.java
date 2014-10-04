@@ -2,7 +2,8 @@ package cmpe226.project1.github.schema1.model;
 
 
 
-import javax.persistence.CascadeType;
+import java.util.Collection;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -21,19 +22,23 @@ public class Actor {
 	@Column(name = "actor_id", updatable = false, nullable = false)
 	private Long id;
 	
-	@OneToMany(cascade = CascadeType.ALL)
-	@JoinColumn(name = "event_id")
-	private Event event;
+	@OneToMany
+	@JoinColumn(name="actor_id")
+	private Collection<Event> events;
 	
+	@OneToMany
+	@JoinColumn(name="actor_id")
+	private Collection<Repository> Repositories;
+	
+	private String login;
 	private String type;
 	private String name;
 	private String blog;
 	private String location;
 	private String email;
 	private String company;
-	
 
-	private String login;
+	
 	public Long getId() {
 		return id;
 	}
