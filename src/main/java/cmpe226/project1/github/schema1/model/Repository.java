@@ -25,10 +25,6 @@ public class Repository {
 	@JoinColumn(name="actor_id")
 	private Actor owner;
 	
-	@OneToOne
-	@JoinColumn(name="event_id")
-	private Event event;
-	
 	private String name;
 	private String html_url;
 	private Date created_at;
