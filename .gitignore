@@ -2,3 +2,6 @@ target/
 .project
 .settings/
 .classpath
+
+# ignore changes to hibernate config file
+hibernate.cfg.xml
