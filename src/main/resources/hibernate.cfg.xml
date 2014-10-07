@@ -32,7 +32,9 @@
 		<!-- Drop and re-create the database schema on startup (use validate to keep changes)-->
 		<property name="hbm2ddl.auto">create</property>
 
-		<mapping class="cmpe226.project1.schema1.data.Fire" />
+		<mapping class="cmpe226.project1.github.schema1.model.Event" />
+		<mapping class="cmpe226.project1.github.schema1.model.Actor" />
+		<mapping class="cmpe226.project1.github.schema1.model.Repository" />
 		
 	</session-factory>
 
