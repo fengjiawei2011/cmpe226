@@ -3,7 +3,6 @@ package cmpe226.project1.github.schema1.model;
 
 
 import java.util.Collection;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -12,6 +11,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import cmpe226.project1.github.schema1.model.Event;
+import cmpe226.project1.github.schema1.model.Repository;
 
 @Entity
 @Table(name="actor")
