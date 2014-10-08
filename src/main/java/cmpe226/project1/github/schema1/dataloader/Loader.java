@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.zip.GZIPInputStream;
 
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -26,10 +26,10 @@ class DataRecord{
 public class Loader {
 
 	public static void main(String[] args) throws IOException {
-		// Loader.load("/Users/frank_feng1/tmp/datadir");
-		Loader.loadArchive("http://data.githubarchive.org/2012-04-11-15.json.gz");
+		String url = "http://data.githubarchive.org/2014-10-05-22.json.gz";
+//		String url = "http://data.githubarchive.org/2012-04-11-15.json.gz";
+		Loader.loadArchive(url);
 	}
-	
 	
 	public static void loadArchive(String url) throws IOException{
 		InputStream inputStream = new URL(url).openStream();
@@ -37,49 +37,49 @@ public class Loader {
 	    InputStream gzipStream = new GZIPInputStream(inputStream);
 	    JsonReader reader = new JsonReader(new InputStreamReader(gzipStream, "UTF-8"));
 	    reader.setLenient(true);
-	    ArrayList<Event> events = new ArrayList<Event>();
-	   
-	    while (reader.hasNext() && reader.peek() != JsonToken.END_DOCUMENT) {
-	    	Event event = gson.fromJson(reader, Event.class);
-	    	//System.out.println(event.getRepository().toString());
-	    	events.add(event);
-//	    	if(events.size() >= 2048){
-//	    		
-//	    		events.clear();
-//	    	}
-	    }
 	    
-	    reader.close();
-	    Loader.upload(events);
-	    
-	}
-	
-	// upload data into db
-		private static void upload(ArrayList<Event> list) {
-			Session session = HibernateUtil.getSessionFactory().getCurrentSession();
-			try {
-				Transaction tx = session.beginTransaction();
-				for (int n = 0; n < list.size(); ++n) {
-					System.out.println("uploading......." + list.get(n).toString());
+	    Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+		try {
+			Transaction tx = session.beginTransaction();
+			System.out.println("Start Uploading .......");
+			int n = 0;
+		    while (reader.hasNext() && reader.peek() != JsonToken.END_DOCUMENT) {
+		    	
+		    	Event event = gson.fromJson(reader, Event.class);
+		    	
+		    	Actor actor = event.getActor();
+				if(actor != null) {
+					// check whether the actor is in DB by "login"
+					Query query = session.createQuery("from Actor where login = :login");
+					query.setString("login", actor.getLogin());
 					
-					Actor actor = list.get(n).getActor();
-					if(actor != null && session.get(Actor.class, actor.getGravatar_id()) == null)
+					if(query.list().size() == 0)
 						session.save(actor);
-					
-					
-					Repository rep = list.get(n).getRepository();
-					if(rep != null && session.get(Repository.class, rep.getId()) == null)
-						session.save(rep);
-					
-					session.save(list.get(n)); 
-					if (n % 2048 == 0) {
-						session.flush();
-						session.clear();
+					else {
+						//TODO update actor attributes
+						event.setActor((Actor) query.list().get(0));
+						System.out.println("Actor updated");
 					}
 				}
-				tx.commit();
-			} finally {
-				session.close();
-			}
+				
+				Repository rep = event.getRepository();
+				if(rep != null && session.get(Repository.class, rep.getId()) == null)
+					// TODO check whether the repository is in DB by "id", then save or update actor
+					session.save(rep);
+				
+				session.save(event); 
+				n++;
+				
+				if (n % 2048 == 0) {
+					session.flush();
+					session.clear();
+				}
+		    }
+		    tx.commit();
+		    System.out.println("Data Uploaded.");
+		} finally {
+			reader.close();
 		}
+	}
+
 }

@@ -2,27 +2,21 @@ package cmpe226.project1.github.schema1.model;
 
 
 
-import java.util.Collection;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import cmpe226.project1.github.schema1.model.Event;
-import cmpe226.project1.github.schema1.model.Repository;
 
 @Entity
 @Table(name="actor")
 public class Actor {
 	
-//	@Id
-//	@GeneratedValue(strategy = GenerationType.AUTO)
-//	@Column(name = "actor_id", updatable = false, nullable = false)
-//	private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(name = "actor_id", updatable = false, nullable = false)
+	private Long id;
 	
 	
 //	@OneToMany
@@ -33,11 +27,15 @@ public class Actor {
 //	@JoinColumn(name="actor_id")
 //	private Collection<Repository> Repositories;
 	
-	@Id
-	@Column(name = "actor_id", updatable = false, nullable = false)
+//	@Id
+//	@Column(name = "actor_id", updatable = false, nullable = false)
+//	private String gravatar_id;
+	
 	private String gravatar_id;
 	
+	@Column(unique = true, updatable = false, nullable = false)
 	private String login = "";
+	
 	private String type = "";
 	private String name = "";
 	private String blog = "";
@@ -60,6 +58,14 @@ public class Actor {
 		return sb.toString();
 	}
 
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+	
 	public String getGravatar_id() {
 		return gravatar_id;
 	}

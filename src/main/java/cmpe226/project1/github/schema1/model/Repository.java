@@ -1,15 +1,10 @@
 package cmpe226.project1.github.schema1.model;
 
-import java.util.Collection;
-import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.google.gson.annotations.SerializedName;
@@ -18,7 +13,7 @@ import com.google.gson.annotations.SerializedName;
 @Table(name="repository")
 public class Repository {
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+//	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "repo_id", updatable = false, nullable = false)
 	private long id;
 
@@ -53,7 +48,6 @@ public class Repository {
 	private String master_branch;
 	
 	
-	
 	@Override
 	public String toString(){
 		StringBuffer sb = new StringBuffer();
@@ -81,20 +75,14 @@ public class Repository {
 		return sb.toString();
 	}
 
-
-
 	public long getId() {
 		return id;
 	}
 
-
-
 	public void setId(long id) {
 		this.id = id;
 	}
-
-
-
+	
 	public String getName() {
 		return name;
 	}
