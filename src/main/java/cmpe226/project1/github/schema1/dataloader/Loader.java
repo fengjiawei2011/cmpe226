@@ -14,6 +14,7 @@ import cmpe226.project1.github.schema1.model.Actor;
 import cmpe226.project1.github.schema1.model.Event;
 import cmpe226.project1.github.schema1.model.Repository;
 import cmpe226.project1.util.HibernateUtil;
+import cmpe226.project1.util.MongoUtil;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
@@ -40,6 +41,8 @@ public class Loader {
 	    
 	    Session session = HibernateUtil.getSessionFactory().getCurrentSession();
 		try {
+			long begin = System.currentTimeMillis();
+			
 			Transaction tx = session.beginTransaction();
 			System.out.println("Start Uploading .......");
 			int n = 0;
@@ -58,7 +61,7 @@ public class Loader {
 					else {
 						//TODO update actor attributes
 						event.setActor((Actor) query.list().get(0));
-						System.out.println("Actor updated");
+//						System.out.println("Actor updated");
 					}
 				}
 				
@@ -76,9 +79,16 @@ public class Loader {
 				}
 		    }
 		    tx.commit();
+		    long end = System.currentTimeMillis();
+		    
 		    System.out.println("Data Uploaded.");
+		    System.out.println("Total records " + n);
+		    
+		    MongoUtil.printStat(begin, end);
+		    
 		} finally {
 			reader.close();
+			return;
 		}
 	}
 
