@@ -32,6 +32,7 @@ public class Loader {
 		Loader.loadArchive(url);
 	}
 	
+	@SuppressWarnings("finally")
 	public static void loadArchive(String url) throws IOException{
 		InputStream inputStream = new URL(url).openStream();
 	    Gson gson = new Gson();
@@ -67,7 +68,7 @@ public class Loader {
 				
 				Repository rep = event.getRepository();
 				if(rep != null && session.get(Repository.class, rep.getId()) == null)
-					// TODO check whether the repository is in DB by "id", then save or update actor
+					// TODO check whether the repository is in DB by "id", then save or update repository
 					session.save(rep);
 				
 				session.save(event); 
