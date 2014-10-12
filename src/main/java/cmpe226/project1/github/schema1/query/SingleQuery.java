@@ -10,7 +10,9 @@ import org.hibernate.Session;
 import cmpe226.project1.github.schema1.model.Repository;
 import cmpe226.project1.util.HibernateUtil;
 
-public class SingleQuery {
+public class SingleQuery implements Runnable{
+	
+	
 	
 	public void find(Long id) {
 //		if (id == null)
@@ -60,9 +62,20 @@ public class SingleQuery {
 		SingleQuery q= new SingleQuery();
 		//q.find(new Long(18221501));
 		q.findByID(new Long(18221501));
-		
 				
-
-		
+	}
+	
+	
+	public void run() {
+		// TODO Auto-generated method stub
+		try {
+			long subthreadid=Thread.currentThread().getId();
+			System.out.println("Sub ThreadId: " + subthreadid +" started");			
+			SingleQuery q= new SingleQuery();
+			q.findByID(new Long(18221501));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
