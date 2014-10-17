@@ -1,26 +1,11 @@
-package cmpe226.project1.github.schema1.model;
+package cmpe226.project1.github.schema2.model;
 
-
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
-@Entity
-@Table(name="actor")
 public class Actor {
 	
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "actor_id", updatable = false, nullable = false)
+
 	private Long id;
 	
 	private String gravatar_id;
-	
-	@Column(unique = true, updatable = false, nullable = false)
 	private String login = "";
 	
 	private String type = "";

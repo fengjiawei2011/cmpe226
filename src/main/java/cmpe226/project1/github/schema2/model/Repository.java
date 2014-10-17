@@ -1,20 +1,9 @@
-package cmpe226.project1.github.schema1.model;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+package cmpe226.project1.github.schema2.model;
 
 import com.google.gson.annotations.SerializedName;
 
-@Entity
-@Table(name="repository")
 public class Repository {
-	@Id
-//	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "repo_id", updatable = false, nullable = false)
+
 	private long id;
 	
 	private String name = "";

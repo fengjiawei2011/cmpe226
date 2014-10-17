@@ -20,6 +20,7 @@ import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 
+
 class DataRecord{
 	String url;
 }
