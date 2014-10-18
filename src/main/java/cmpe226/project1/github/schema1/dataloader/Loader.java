@@ -28,9 +28,24 @@ class DataRecord{
 public class Loader {
 
 	public static void main(String[] args) throws IOException {
-		String url = "http://data.githubarchive.org/2014-10-05-22.json.gz";
+//		String url = "http://data.githubarchive.org/2014-10-05-0.json.gz";
+//		String url = "http://data.githubarchive.org/2014-10-05-22.json.gz";		
 //		String url = "http://data.githubarchive.org/2012-04-11-15.json.gz";
-		Loader.loadArchive(url);
+//		long begin = System.currentTimeMillis();
+		for (int i=10; i<14; i++){
+			try {
+				String url ="http://data.githubarchive.org/2014-10-05-"+i+".json.gz";
+				Loader.loadArchive(url);
+				System.out.println("Data Uploaded from" + url);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				continue;
+			}
+		}
+//		long end = System.currentTimeMillis();
+//	    
+//	    MongoUtil.printStat(begin, end);
 	}
 	
 	@SuppressWarnings("finally")
@@ -43,7 +58,7 @@ public class Loader {
 	    
 	    Session session = HibernateUtil.getSessionFactory().getCurrentSession();
 		try {
-			long begin = System.currentTimeMillis();
+			
 			
 			Transaction tx = session.beginTransaction();
 			System.out.println("Start Uploading .......");
@@ -81,12 +96,7 @@ public class Loader {
 				}
 		    }
 		    tx.commit();
-		    long end = System.currentTimeMillis();
 		    
-		    System.out.println("Data Uploaded.");
-		    System.out.println("Total records " + n);
-		    
-		    MongoUtil.printStat(begin, end);
 		    
 		} finally {
 			reader.close();
