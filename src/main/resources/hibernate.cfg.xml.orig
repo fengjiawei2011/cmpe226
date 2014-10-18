@@ -10,8 +10,8 @@
 
 		<!-- Database connection settings -->
 		<property name="connection.driver_class">org.postgresql.Driver</property>
-		<property name="connection.url">jdbc:postgresql://localhost/frank_feng1</property>
-		<property name="connection.username">frank_feng1</property>
+		<property name="connection.url">jdbc:postgresql://localhost/lingzhang</property>
+		<property name="connection.username">lingzhang</property>
 		<property name="connection.password"></property>
 
 		<!-- JDBC connection pool (use the built-in) -->
@@ -30,13 +30,20 @@
 		<property name="current_session_context_class">thread</property>
 
 		<!-- Drop and re-create the database schema on startup (use validate to keep changes)-->
-
+<<<<<<< HEAD
+		<!-- <property name="hbm2ddl.auto">create</property>  -->
+		 <property name="hbm2ddl.auto">validate</property> 
+		
+		<mapping class="cmpe226.project1.github.schema1.model.Event" />
+		<mapping class="cmpe226.project1.github.schema1.model.Actor" />
+		<mapping class="cmpe226.project1.github.schema1.model.Repository" />
+=======
 		<property name="hbm2ddl.auto">validate</property>
 
 		<mapping class="cmpe226.project1.github.schema2.model.Event" />
 		<!-- <mapping class="cmpe226.project1.github.schema1.model.Actor" />
 		<mapping class="cmpe226.project1.github.schema1.model.Repository" /> -->
-
+>>>>>>> feb06bb14b024fc52ff44b3d43c582edfdfd0dd4
 		
 	</session-factory>
 

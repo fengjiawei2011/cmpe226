@@ -13,8 +13,11 @@ import cmpe226.project1.util.MongoUtil;
 
 public class LargeQuery {
 	
+	
 	@SuppressWarnings("unchecked")
 	public static void findActorByLanguage(String lang) {
+		//find all the actors that have worked on specific language
+		
 		//if (id == null)
 			//return null;
 
@@ -98,7 +101,7 @@ public class LargeQuery {
 	public static void main(String[] args) throws Exception {
 		String lang = "JavaScript";
 		findActorByLanguage(lang);
-		findAllActor();
+		//findAllActor();
 
 	}
 
