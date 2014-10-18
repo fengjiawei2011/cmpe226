@@ -1,4 +1,4 @@
-package cmpe226.project1.github.schema1.query;
+package cmpe226.project1.github.schema2.query;
 
 import java.util.List;
 
@@ -10,14 +10,13 @@ import cmpe226.project1.util.MongoUtil;
 
 /**
  * @author lingzhang
- * 3rd Normal Form :There are 3 tables: event, actor, repository
+ * 0 Normal Form :There are only 1 table : event_single_table
  * Query1: find the actor that works on largest number of repository
  * 
  * SQLs query:
- * select a.login, count(distinct(e.repo_id)) as number_of_worked_repo 
- * from event e, actor a
- * where e.actor_id=a.actor_id
- * group by a.login
+ * select actor_login, count(distinct(repo_id)) as number_of_worked_repo 
+ * from event_single_table
+ * group by actor_login
  * order by number_of_worked_repo desc
  * limit 1;
  */
@@ -30,9 +29,9 @@ public class Query1 {
 		try {			
 			session.beginTransaction();			
 			Query query=session.createQuery(
-					"select a.login, count(distinct e.repository) as number_of_worked_repo "
-					+ "from Event e join e.actor as a "
-					+ "group by a.login "
+					"select actor_login, count(distinct repo_id) as number_of_worked_repo "
+					+ "from EventSingle "
+					+ "group by actor_login "
 					+ "order by number_of_worked_repo desc "
 					).setFirstResult(0).setMaxResults(1);
 			
@@ -40,7 +39,7 @@ public class Query1 {
 			List<Object[]> ls= (List<Object[]>) query.list();
 			
 			//print out the query result
-			System.out.println("Result of Query1 On 3NF: The actors with most repository------ ");
+			System.out.println("Result of Query1 On 0NF: The actors with most repository------");
 			for (Object[] row : ls) {			
 				System.out.println("actor_login: " + (String)row[0] +", number_of_worked_repo: " + (Long)row[1] );
 			}

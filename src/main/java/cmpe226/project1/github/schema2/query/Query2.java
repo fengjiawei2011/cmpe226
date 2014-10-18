@@ -1,4 +1,4 @@
-package cmpe226.project1.github.schema1.query;
+package cmpe226.project1.github.schema2.query;
 
 import java.util.List;
 
@@ -10,16 +10,15 @@ import cmpe226.project1.util.MongoUtil;
 
 /**
  * @author lingzhang
- * 3rd Normal Form :There are 3 tables: event, actor, repository
+ * 0rd Normal Form :There are only 1 table : event_single_table
  * Query2: find the most popular language (the language that largest number of actor works on)
  * 
  * SQLs query:
- * select r.language, count(distinct(a.login)) as number_of_users
- * from repository r, event e, actor a
- * where r.repo_id=e.repo_id and e.actor_id=a.actor_id
- * group by r.language
+ * select repo_language, count(distinct(actor_login)) as number_of_users
+ * from event_single_table
+ * group by repo_language
  * order by number_of_users desc
- * limit 1;
+ * limit 2;
  */
 public class Query2 {
 	
@@ -30,9 +29,9 @@ public class Query2 {
 		try {			
 			session.beginTransaction();			
 			Query query=session.createQuery(
-							"select r.language, count(distinct a.login) as number_of_users "
-							+ "from Event e join e.actor as a join e.repository as r "
-							+ "group by r.language "
+							"select repo_language, count(distinct actor_login) as number_of_users "
+							+ "from EventSingle "
+							+ "group by repo_language "
 							+ "order by number_of_users desc "
 							).setFirstResult(0).setMaxResults(2);
 
@@ -41,7 +40,7 @@ public class Query2 {
 			List<Object[]> ls= (List<Object[]>) query.list();
 			
 			//print out the query result
-			System.out.println("Result of Query2 On 3NF: The most popular language------");
+			System.out.println("Result of Query2 On 0NF: The most popular language------");
 			for (Object[] row : ls) {			
 				System.out.println("language: " + (String)row[0] +", number_of_users: " + (Long)row[1] );
 			}
