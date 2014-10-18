@@ -1,7 +1,7 @@
 package cmpe226.project1.github.schema2.model;
 
-import cmpe226.project1.github.schema2.model.Actor;
-import cmpe226.project1.github.schema2.model.Repository;
+import cmpe226.project1.github.schema2.model.ActorSingle;
+import cmpe226.project1.github.schema2.model.RepositorySingle;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -16,11 +16,11 @@ public class EventMaper {
 	private boolean is_public;
 
 	
-	private Repository repository;
+	private RepositorySingle repository;
 
 	
 	@SerializedName("actor_attributes")
-	private Actor actor;
+	private ActorSingle actor;
 
 	@Override
 	public String toString() {
@@ -69,19 +69,19 @@ public class EventMaper {
 		this.is_public = is_public;
 	}
 
-	public Repository getRepository() {
+	public RepositorySingle getRepository() {
 		return repository;
 	}
 
-	public void setRepository(Repository repository) {
+	public void setRepository(RepositorySingle repository) {
 		this.repository = repository;
 	}
 
-	public Actor getActor() {
+	public ActorSingle getActor() {
 		return actor;
 	}
 
-	public void setActor(Actor actor) {
+	public void setActor(ActorSingle actor) {
 		this.actor = actor;
 	}
 

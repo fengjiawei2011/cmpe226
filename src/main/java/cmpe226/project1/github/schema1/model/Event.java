@@ -20,7 +20,8 @@ public class Event {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "event_id", updatable = false, nullable = false)
 	private Long id;
-
+	
+	@Column(length = 1024)
 	private String url;
 	private String type;
 	private String created_at;

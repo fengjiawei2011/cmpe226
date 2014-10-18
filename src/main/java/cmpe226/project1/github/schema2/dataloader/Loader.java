@@ -9,10 +9,10 @@ import java.util.zip.GZIPInputStream;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import cmpe226.project1.github.schema2.model.Actor;
+import cmpe226.project1.github.schema2.model.ActorSingle;
 import cmpe226.project1.github.schema2.model.EventSingle;
 import cmpe226.project1.github.schema2.model.EventMaper;
-import cmpe226.project1.github.schema2.model.Repository;
+import cmpe226.project1.github.schema2.model.RepositorySingle;
 import cmpe226.project1.util.HibernateUtil;
 import cmpe226.project1.util.MongoUtil;
 
@@ -32,16 +32,15 @@ public class Loader {
 		int rows = 0;
 		Session session = null;
 		long begin = System.currentTimeMillis();
+		System.out.println("\n**************Schema2 0 Normal Form**************");
 		
-		
-		for (int i = 1; i < 23; i++) {
+		for (int i = 0; i < 2; i++) {
 			String url = "";
-			if (i < 10) {
-				url += "2014-10-05-0" + i + ".json.gz";
-			} else {
-				url += "2014-10-05-" + i + ".json.gz";
-			}
+
+			url += "2014-10-05-" + i + ".json.gz";
+			
 			try {
+				
 				session = HibernateUtil.getSessionFactory().openSession();
 				rows += Loader.loadArchive(domain + url, session);
 			} catch (Exception e) {
@@ -72,7 +71,7 @@ public class Loader {
 			reader.setLenient(true);			
 
 			Transaction tx = session.beginTransaction();
-			System.out.println("Start Uploading .......");
+			System.out.println("Start Uploading for "+ url + " to schema2-0NF");
 			
 			while (reader.hasNext() && reader.peek() != JsonToken.END_DOCUMENT) {
 
@@ -104,7 +103,7 @@ public class Loader {
 			EventMaper oldEvent) {
 		EventSingle newEvent = new EventSingle();
 
-		Actor actor = oldEvent.getActor();
+		ActorSingle actor = oldEvent.getActor();
 		if (actor != null) {
 			newEvent.setActor_blog(actor.getBlog());
 			newEvent.setActor_company(actor.getCompany());
@@ -114,7 +113,7 @@ public class Loader {
 			newEvent.setActor_name(actor.getName());
 			newEvent.setActor_type(actor.getType());
 		}
-		Repository rep = oldEvent.getRepository();
+		RepositorySingle rep = oldEvent.getRepository();
 		if (rep != null) {
 			newEvent.setRepo_id(rep.getId());
 			newEvent.setRepo_forks(rep.getForks());

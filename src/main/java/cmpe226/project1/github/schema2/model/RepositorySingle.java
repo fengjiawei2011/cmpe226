@@ -2,7 +2,7 @@ package cmpe226.project1.github.schema2.model;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Repository {
+public class RepositorySingle {
 
 	private long id;
 	

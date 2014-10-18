@@ -1,6 +1,6 @@
 package cmpe226.project1.github.schema2.model;
 
-public class Actor {
+public class ActorSingle {
 	
 
 	private Long id;

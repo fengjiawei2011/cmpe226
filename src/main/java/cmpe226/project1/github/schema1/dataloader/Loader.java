@@ -25,44 +25,55 @@ class DataRecord{
 	String url;
 }
 
+// schema 1, Third Normal form
 public class Loader {
 
 	public static void main(String[] args) throws IOException {
-//		String url = "http://data.githubarchive.org/2014-10-05-0.json.gz";
-//		String url = "http://data.githubarchive.org/2014-10-05-22.json.gz";		
-//		String url = "http://data.githubarchive.org/2012-04-11-15.json.gz";
-//		long begin = System.currentTimeMillis();
-		for (int i=10; i<14; i++){
+
+		long begin = System.currentTimeMillis();
+		int records=0;
+		Session session =null;
+		System.out.println("\n**************Schema1 3rd Normal Form**************");
+		
+		for (int i=0; i<2; i++){
 			try {
 				String url ="http://data.githubarchive.org/2014-10-05-"+i+".json.gz";
-				Loader.loadArchive(url);
-				System.out.println("Data Uploaded from" + url);
+				session = HibernateUtil.getSessionFactory().openSession();
+				
+				records += Loader.loadArchive(url,session);
+				
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
-				continue;
-			}
+				//e.printStackTrace();
+				//continue;
+			}finally{
+				session.close();
+			}	
 		}
-//		long end = System.currentTimeMillis();
-//	    
-//	    MongoUtil.printStat(begin, end);
+		
+		long end = System.currentTimeMillis();
+		
+		System.out.println("Data Uploaded.");
+		System.out.println("Total records " + records);
+	    
+	    MongoUtil.printStat(begin, end);
 	}
 	
+	
 	@SuppressWarnings("finally")
-	public static void loadArchive(String url) throws IOException{
-		InputStream inputStream = new URL(url).openStream();
-	    Gson gson = new Gson();
-	    InputStream gzipStream = new GZIPInputStream(inputStream);
-	    JsonReader reader = new JsonReader(new InputStreamReader(gzipStream, "UTF-8"));
-	    reader.setLenient(true);
-	    
-	    Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+	public static int loadArchive(String url, Session session) throws IOException{
+		
+		int n = 0;
+		JsonReader reader = null;
 		try {
-			
-			
-			Transaction tx = session.beginTransaction();
-			System.out.println("Start Uploading .......");
-			int n = 0;
+			InputStream inputStream = new URL(url).openStream();
+		    Gson gson = new Gson();
+		    InputStream gzipStream = new GZIPInputStream(inputStream);
+		    reader = new JsonReader(new InputStreamReader(gzipStream, "UTF-8"));
+		    reader.setLenient(true);
+		    
+			Transaction tx = session.beginTransaction();	
+			System.out.println("Start Uploading for " +url+ " to schema1-3NF");
 		    while (reader.hasNext() && reader.peek() != JsonToken.END_DOCUMENT) {
 		    	
 		    	Event event = gson.fromJson(reader, Event.class);
@@ -83,10 +94,10 @@ public class Loader {
 				}
 				
 				Repository rep = event.getRepository();
-				if(rep != null && session.get(Repository.class, rep.getId()) == null)
+				if(rep != null && session.get(Repository.class, rep.getId()) == null){
 					// TODO check whether the repository is in DB by "id", then save or update repository
 					session.save(rep);
-				
+				}
 				session.save(event); 
 				n++;
 				
@@ -96,12 +107,14 @@ public class Loader {
 				}
 		    }
 		    tx.commit();
-		    
-		    
-		} finally {
-			reader.close();
-			return;
+		      
+		} catch(Exception e){ 
+			System.out.println("data upload fail!!");
 		}
+		finally {
+			reader.close();			
+		}
+		return n;
 	}
 
 }
