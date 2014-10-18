@@ -10,7 +10,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import cmpe226.project1.github.schema2.model.Actor;
-import cmpe226.project1.github.schema2.model.Event;
+import cmpe226.project1.github.schema2.model.EventSingle;
 import cmpe226.project1.github.schema2.model.EventMaper;
 import cmpe226.project1.github.schema2.model.Repository;
 import cmpe226.project1.util.HibernateUtil;
@@ -28,37 +28,62 @@ class DataRecord {
 public class Loader {
 
 	public static void main(String[] args) throws IOException {
-		String url = "http://data.githubarchive.org/2014-10-05-22.json.gz";
-		// String url = "http://data.githubarchive.org/2012-04-11-15.json.gz";
-		Loader.loadArchive(url);
+		String domain = "http://data.githubarchive.org/";
+		int rows = 0;
+		Session session = null;
+		long begin = System.currentTimeMillis();
+		
+		
+		for (int i = 1; i < 23; i++) {
+			String url = "";
+			if (i < 10) {
+				url += "2014-10-05-0" + i + ".json.gz";
+			} else {
+				url += "2014-10-05-" + i + ".json.gz";
+			}
+			try {
+				session = HibernateUtil.getSessionFactory().openSession();
+				rows += Loader.loadArchive(domain + url, session);
+			} catch (Exception e) {
+				//System.out.println("no data");
+			}finally{
+				session.close();
+			}
+		}
+		long end = System.currentTimeMillis();
+
+		System.out.println("Data Uploaded.");
+		System.out.println("Total records " + rows);
+
+		MongoUtil.printStat(begin, end);
+
 	}
 
 	@SuppressWarnings("finally")
-	public static void loadArchive(String url) throws IOException {
-		InputStream inputStream = new URL(url).openStream();
-		Gson gson = new Gson();
-		InputStream gzipStream = new GZIPInputStream(inputStream);
-		JsonReader reader = new JsonReader(new InputStreamReader(gzipStream,
-				"UTF-8"));
-		reader.setLenient(true);
-
-		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+	public static int loadArchive(String url, Session session) throws IOException {
+		int n = 0;
+		JsonReader reader = null;
 		try {
-			long begin = System.currentTimeMillis();
+			InputStream inputStream = new URL(url).openStream();
+			Gson gson = new Gson();
+			InputStream gzipStream = new GZIPInputStream(inputStream);
+			reader = new JsonReader(new InputStreamReader(
+					gzipStream, "UTF-8"));
+			reader.setLenient(true);			
 
 			Transaction tx = session.beginTransaction();
 			System.out.println("Start Uploading .......");
-			int n = 0;
+			
 			while (reader.hasNext() && reader.peek() != JsonToken.END_DOCUMENT) {
 
-				EventMaper eventMapper = gson.fromJson(reader, EventMaper.class);
+				EventMaper eventMapper = gson
+						.fromJson(reader, EventMaper.class);
 
-				Event event_1 = getNewEvent(eventMapper);
-				System.out.println(event_1.toString() + " " + n);
+				EventSingle event_1 = getNewEvent(eventMapper);
+				//System.out.println(event_1.toString() + " " + n);
 
 				session.save(event_1);
 				n++;
-				
 
 				if (n % 2048 == 0) {
 					session.flush();
@@ -66,24 +91,18 @@ public class Loader {
 				}
 			}
 			tx.commit();
-			long end = System.currentTimeMillis();
-
-			System.out.println("Data Uploaded.");
-			System.out.println("Total records " + n);
-
-			MongoUtil.printStat(begin, end);
 
 		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
+			System.out.println("data file not found!");
+		}finally{
 			reader.close();
-			return;
 		}
+		return n;
 	}
 
-	public static cmpe226.project1.github.schema2.model.Event getNewEvent(
+	public static cmpe226.project1.github.schema2.model.EventSingle getNewEvent(
 			EventMaper oldEvent) {
-		Event newEvent = new Event();
+		EventSingle newEvent = new EventSingle();
 
 		Actor actor = oldEvent.getActor();
 		if (actor != null) {

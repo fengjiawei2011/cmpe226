@@ -5,19 +5,20 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-
 import javax.persistence.Table;
+import javax.transaction.Transactional.TxType;
 
 
 @Entity
 @Table(name = "event_single_table")
-public class Event {
+public class EventSingle {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "event_id", updatable = false, nullable = false)
 	private Long event_id;
 	
+	@Column(length = 1024)
 	private String event_url;
 	private String event_type;
 	private String event_created_at;
@@ -33,6 +34,7 @@ public class Event {
 	private String actor_login = "";
 	private String actor_type = "";
 	private String actor_name = "";
+	@Column(columnDefinition = "text")
 	private String actor_blog = "";
 	private String actor_location = "";
 	private String actor_email = "";
@@ -44,6 +46,7 @@ public class Event {
 	//******repo******
 	private long repo_id;
 	private String repo_name = "";
+	
 	private String repo_Url = "";
 	
 	

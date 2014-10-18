@@ -31,9 +31,10 @@
 
 		<!-- Drop and re-create the database schema on startup (use validate to keep changes)-->
 
-		<property name="hbm2ddl.auto">validate</property>
+		<property name="hbm2ddl.auto">create</property>
 
-		<mapping class="cmpe226.project1.github.schema2.model.Event" />
+
+		<mapping class="cmpe226.project1.github.schema2.model.EventSingle" />
 		<!-- <mapping class="cmpe226.project1.github.schema1.model.Actor" />
 		<mapping class="cmpe226.project1.github.schema1.model.Repository" /> -->
 
