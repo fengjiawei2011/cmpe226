@@ -34,7 +34,7 @@ public class Loader {
 		long begin = System.currentTimeMillis();
 		System.out.println("\n**************Schema2 0 Normal Form**************");
 		
-		for (int i = 0; i < 2; i++) {
+		for (int i = 0; i < 24; i++) {
 			String url = "";
 
 			url += "2014-10-05-" + i + ".json.gz";

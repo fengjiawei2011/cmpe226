@@ -35,7 +35,7 @@ public class Loader {
 		Session session =null;
 		System.out.println("\n**************Schema1 3rd Normal Form**************");
 		
-		for (int i=0; i<2; i++){
+		for (int i=0; i<24; i++){
 			try {
 				String url ="http://data.githubarchive.org/2014-10-05-"+i+".json.gz";
 				session = HibernateUtil.getSessionFactory().openSession();
