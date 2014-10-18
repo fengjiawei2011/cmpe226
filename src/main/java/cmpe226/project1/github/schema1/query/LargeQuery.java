@@ -33,7 +33,9 @@ public class LargeQuery {
 												+"from Event e join e.repository as r join e.actor as a " 
 												+"where r.language=:language "
 												+"group by a.id " 
-												+"order by number_of_events desc ");			
+												+"order by number_of_events desc "
+												//);
+												).setFirstResult(0).setMaxResults(10);		
 			query.setString("language", lang);
 			Set<ActorResult> set = new LinkedHashSet<ActorResult>(query.list());
 			r = new ArrayList<ActorResult>(set);
