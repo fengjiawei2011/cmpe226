@@ -86,18 +86,13 @@ public class Loader {
 					
 					if(query.list().size() == 0)
 						session.save(actor);
-					else {
-						//TODO update actor attributes
-						event.setActor((Actor) query.list().get(0));
-//						System.out.println("Actor updated");
-					}
 				}
 				
 				Repository rep = event.getRepository();
 				if(rep != null && session.get(Repository.class, rep.getId()) == null){
-					// TODO check whether the repository is in DB by "id", then save or update repository
 					session.save(rep);
 				}
+				
 				session.save(event); 
 				n++;
 				

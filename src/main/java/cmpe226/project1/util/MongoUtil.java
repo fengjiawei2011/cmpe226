@@ -31,6 +31,18 @@ public class MongoUtil {
 		return logCollection;
 	}
 	
+	public static double avg(List<Double> data){
+		double sum = 0;
+		int n = 0;
+		
+		for (Double num : data){
+			sum += num;
+			n++;
+		}
+		if (n ==0) return -1;
+		else return sum/n;
+	}
+	
 	public static void printStat (long begin, long end){
 		System.out.println("Start at " + new Date(begin));
 	    System.out.println("End at " + new Date(end));
@@ -61,6 +73,7 @@ public class MongoUtil {
 	        System.out.println("Memory: " + memSample);
 	        System.out.println("RTPS: " + rtpsSample);
 	        System.out.println("WTPS: " + wtpsSample);
+	        System.out.println(String.format("Avg(CPU, Memory, RTPS, WTPS): %.2f %.2f %.2f %.2f" , avg(cpuSample), avg(memSample), avg(rtpsSample), avg(wtpsSample)));
 	        
 	    } finally {
 	        cursor.close();
