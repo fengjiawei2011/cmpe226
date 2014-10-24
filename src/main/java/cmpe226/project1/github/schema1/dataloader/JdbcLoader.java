@@ -32,7 +32,7 @@ public class JdbcLoader {
 	public static void main(String[] args) throws Exception {
 		String url = "http://data.githubarchive.org/2014-10-05-22.json.gz";
 		// String url = "http://data.githubarchive.org/2012-04-11-15.json.gz";
-		Loader.loadArchive(url);
+		JdbcLoader.loadArchive(url);
 	}
 
 	@SuppressWarnings("finally")
