@@ -1,6 +1,6 @@
 package cmpe226.project1.github.schema1.dataloader;
 
-import java.io.IOException;
+//import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -19,13 +19,12 @@ import java.sql.SQLException;
 import cmpe226.project1.github.schema1.model.Actor;
 import cmpe226.project1.github.schema1.model.Event;
 import cmpe226.project1.github.schema1.model.Repository;
-import cmpe226.project1.util.HibernateUtil;
+//import cmpe226.project1.util.HibernateUtil;
 import cmpe226.project1.util.MongoUtil;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
-
 
 public class JdbcLoader {
 
@@ -72,7 +71,6 @@ public class JdbcLoader {
 							stmt.setString(6, actor.getLogin());
 							stmt.setString(7, actor.getName());
 							stmt.setString(8, actor.getType());
-							// stmt.setLong(9, actor.getId());
 							stmt.executeUpdate();
 							stmt.close();
 							System.out.println(stmt);
@@ -84,31 +82,31 @@ public class JdbcLoader {
 
 					}
 
-					else {
-						// TODO update actor attributes
-						// event.setActor((Actor) query.list().get(0)); ??
-						try {
-
-							PreparedStatement stmt = connection
-									.prepareStatement("update actor set (blog, company, email, gravatar_id, location, name, type)=(?, ?, ?, ?, ?, ?, ?) where login=?");
-							stmt.setString(1, actor.getBlog());
-							stmt.setString(2, actor.getCompany());
-							stmt.setString(3, actor.getEmail());
-							stmt.setString(4, actor.getGravatar_id());
-							stmt.setString(5, actor.getLocation());
-							stmt.setString(6, actor.getName());
-							stmt.setString(7, actor.getType());
-							stmt.setString(8, actor.getLogin());
-							stmt.executeUpdate();
-							stmt.close();
-							System.out.println(stmt);
-						} catch (SQLException sqle) {
-							System.err
-									.println("Something exploded running the update: "
-											+ sqle.getMessage());
-						}
-
-					}
+//					else {
+//						// TODO update actor attributes
+//						// event.setActor((Actor) query.list().get(0)); ??
+//						try {
+//
+//							PreparedStatement stmt = connection
+//									.prepareStatement("update actor set (blog, company, email, gravatar_id, location, name, type)=(?, ?, ?, ?, ?, ?, ?) where login=?");
+//							stmt.setString(1, actor.getBlog());
+//							stmt.setString(2, actor.getCompany());
+//							stmt.setString(3, actor.getEmail());
+//							stmt.setString(4, actor.getGravatar_id());
+//							stmt.setString(5, actor.getLocation());
+//							stmt.setString(6, actor.getName());
+//							stmt.setString(7, actor.getType());
+//							stmt.setString(8, actor.getLogin());
+//							stmt.executeUpdate();
+//							stmt.close();
+//							System.out.println(stmt);
+//						} catch (SQLException sqle) {
+//							System.err
+//									.println("Something exploded running the update: "
+//											+ sqle.getMessage());
+//						}
+//
+//					}
 
 				}
 
@@ -175,7 +173,11 @@ public class JdbcLoader {
 						stmtEvent.setLong(1, actor_id);
 						stmtEvent.setString(2, event.getCreated_at());
 						stmtEvent.setBoolean(3, event.isIs_public());
-						stmtEvent.setLong(4, rep.getId());
+						if (rep != null) {
+							stmtEvent.setLong(4, rep.getId());
+						} else {
+							stmtEvent.setNull(4, java.sql.Types.NULL);
+						}
 						stmtEvent.setString(5, event.getType());
 						stmtEvent.setString(6, event.getUrl());
 						stmtEvent.executeUpdate();
