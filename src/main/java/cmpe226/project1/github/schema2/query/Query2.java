@@ -10,7 +10,7 @@ import cmpe226.project1.util.MongoUtil;
 
 /**
  * @author lingzhang
- * 0rd Normal Form :There are only 1 table : event_single_table
+ * Schema2--0rd Normal Form :There are only 1 table : event_single_table
  * Query2: find the most popular language (the language that largest number of actor works on)
  * 
  * SQLs query:

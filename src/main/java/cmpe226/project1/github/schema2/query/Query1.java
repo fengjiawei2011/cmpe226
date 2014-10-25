@@ -10,7 +10,7 @@ import cmpe226.project1.util.MongoUtil;
 
 /**
  * @author lingzhang
- * 0 Normal Form :There are only 1 table : event_single_table
+ * Schema2--0 Normal Form :There are only 1 table : event_single_table
  * Query1: find the actor that works on largest number of repository
  * 
  * SQLs query:
