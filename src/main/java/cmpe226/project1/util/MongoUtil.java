@@ -17,7 +17,7 @@ public class MongoUtil {
 	private static DBCollection connectMongo() {
 		try {
 			
-			System.out.println("Connection MongoDB ......");
+			System.out.println("Connecting MongoDB ......");
 			final MongoClient mongoClient = new MongoClient("localhost" , 27017 );			
 			return mongoClient.getDB("logstash").getCollection("postgresql");
 			

@@ -1,9 +1,9 @@
 package cmpe226.project1.github.schema2.dataloader;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.zip.GZIPInputStream;
 
 import org.hibernate.Session;
@@ -20,37 +20,31 @@ import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 
-class DataRecord {
-	String url;
-}
 
 // schema 2 , zero normal form.
 public class Loader {
+	
+	static String dataDir = System.getProperty("user.dir") + "/data/";
 
 	public static void main(String[] args) throws IOException {
-		String domain = "http://data.githubarchive.org/";
 		int rows = 0;
-		Session session = null;
-		long begin = System.currentTimeMillis();
 		System.out.println("\n**************Schema2 0 Normal Form**************");
 		
-		for (int i = 0; i < 24; i++) {
-			String url = "";
-
-			url += "2014-10-05-" + i + ".json.gz";
+		long begin = System.currentTimeMillis();
+		
+		for (int h = 0; h < 24; h++) {
+			String filename ="2014-10-09-"+h+".json.gz";
 			
 			try {
-				
-				session = HibernateUtil.getSessionFactory().openSession();
-				rows += Loader.loadArchive(domain + url, session);
+				rows += Loader.loadArchive(filename);
 			} catch (Exception e) {
-				//System.out.println("no data");
-			}finally{
-				session.close();
+				e.printStackTrace();
 			}
 		}
 		long end = System.currentTimeMillis();
 
+		HibernateUtil.getSessionFactory().close();
+		
 		System.out.println("Data Uploaded.");
 		System.out.println("Total records " + rows);
 
@@ -58,20 +52,23 @@ public class Loader {
 
 	}
 
-	@SuppressWarnings("finally")
-	public static int loadArchive(String url, Session session) throws IOException {
+
+	public static int loadArchive(String fn) {
 		int n = 0;
 		JsonReader reader = null;
+		Transaction tx = null;
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		
 		try {
-			InputStream inputStream = new URL(url).openStream();
+			InputStream inputStream =  new FileInputStream(dataDir + fn);
 			Gson gson = new Gson();
 			InputStream gzipStream = new GZIPInputStream(inputStream);
 			reader = new JsonReader(new InputStreamReader(
 					gzipStream, "UTF-8"));
 			reader.setLenient(true);			
 
-			Transaction tx = session.beginTransaction();
-			System.out.println("Start Uploading for "+ url + " to schema2-0NF");
+			tx = session.beginTransaction();
+			System.out.println("Start Uploading for "+ fn + " to schema2-0NF");
 			
 			while (reader.hasNext() && reader.peek() != JsonToken.END_DOCUMENT) {
 
@@ -90,11 +87,13 @@ public class Loader {
 				}
 			}
 			tx.commit();
-
-		} catch (Exception e) {
-			System.out.println("data file not found!");
-		}finally{
 			reader.close();
+			
+		} catch (Exception e) {
+			if (tx != null) tx.rollback();
+			System.out.println("data file not found!" + e.getMessage());
+		}finally{
+			session.close();
 		}
 		return n;
 	}
