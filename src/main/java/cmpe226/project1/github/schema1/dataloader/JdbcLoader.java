@@ -1,15 +1,9 @@
 package cmpe226.project1.github.schema1.dataloader;
 
-//import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.zip.GZIPInputStream;
-
-//import org.hibernate.Query;
-//import org.hibernate.Session;
-//import org.hibernate.Transaction;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -19,35 +13,60 @@ import java.sql.SQLException;
 import cmpe226.project1.github.schema1.model.Actor;
 import cmpe226.project1.github.schema1.model.Event;
 import cmpe226.project1.github.schema1.model.Repository;
-//import cmpe226.project1.util.HibernateUtil;
 import cmpe226.project1.util.MongoUtil;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 
+// schema 1, Third Normal form
 public class JdbcLoader {
 
 	public static void main(String[] args) throws Exception {
-		String url = "http://data.githubarchive.org/2014-10-05-22.json.gz";
-		// String url = "http://data.githubarchive.org/2012-04-11-15.json.gz";
-		JdbcLoader.loadArchive(url);
+
+		long begin = System.currentTimeMillis();
+		int records = 0;
+		System.out
+				.println("\n**************Schema1 3rd Normal Form**************");
+
+		for (int i = 0; i < 24; i++) {
+			try {
+				String url = "http://data.githubarchive.org/2014-10-05-" + i
+						+ ".json.gz";
+
+				records += JdbcLoader.loadArchive(url);
+
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				// e.printStackTrace();
+				// continue;
+			}
+
+		}
+
+		long end = System.currentTimeMillis();
+
+		System.out.println("Data Uploaded.");
+		System.out.println("Total records " + records);
+
+		MongoUtil.printStat(begin, end);
 	}
 
 	@SuppressWarnings("finally")
-	public static void loadArchive(String url) throws Exception {
-		InputStream inputStream = new URL(url).openStream();
-		Gson gson = new Gson();
-		InputStream gzipStream = new GZIPInputStream(inputStream);
-		JsonReader reader = new JsonReader(new InputStreamReader(gzipStream,
-				"UTF-8"));
-		reader.setLenient(true);
+	public static int loadArchive(String url) throws Exception {
 
+		int n = 0;
+		JsonReader reader = null;
 		Connection connection = getConnection();
 		try {
-			long begin = System.currentTimeMillis();
-			System.out.println("Start Uploading .......");
-			int n = 0;
+			InputStream inputStream = new URL(url).openStream();
+			Gson gson = new Gson();
+			InputStream gzipStream = new GZIPInputStream(inputStream);
+			reader = new JsonReader(new InputStreamReader(gzipStream, "UTF-8"));
+			reader.setLenient(true);
+
+			System.out
+					.println("Start Uploading for " + url + " to schema1-3NF");
 			while (reader.hasNext() && reader.peek() != JsonToken.END_DOCUMENT) {
 
 				Event event = gson.fromJson(reader, Event.class);
@@ -73,7 +92,7 @@ public class JdbcLoader {
 							stmt.setString(8, actor.getType());
 							stmt.executeUpdate();
 							stmt.close();
-							System.out.println(stmt);
+							// System.out.println(stmt);
 						} catch (SQLException sqle) {
 							System.err
 									.println("Something exploded running the insert: "
@@ -81,32 +100,6 @@ public class JdbcLoader {
 						}
 
 					}
-
-//					else {
-//						// TODO update actor attributes
-//						// event.setActor((Actor) query.list().get(0)); ??
-//						try {
-//
-//							PreparedStatement stmt = connection
-//									.prepareStatement("update actor set (blog, company, email, gravatar_id, location, name, type)=(?, ?, ?, ?, ?, ?, ?) where login=?");
-//							stmt.setString(1, actor.getBlog());
-//							stmt.setString(2, actor.getCompany());
-//							stmt.setString(3, actor.getEmail());
-//							stmt.setString(4, actor.getGravatar_id());
-//							stmt.setString(5, actor.getLocation());
-//							stmt.setString(6, actor.getName());
-//							stmt.setString(7, actor.getType());
-//							stmt.setString(8, actor.getLogin());
-//							stmt.executeUpdate();
-//							stmt.close();
-//							System.out.println(stmt);
-//						} catch (SQLException sqle) {
-//							System.err
-//									.println("Something exploded running the update: "
-//											+ sqle.getMessage());
-//						}
-//
-//					}
 
 				}
 
@@ -148,7 +141,7 @@ public class JdbcLoader {
 							stmt.setLong(19, rep.getId());
 							stmt.executeUpdate();
 							stmt.close();
-							System.out.println(stmt);
+							// System.out.println(stmt);
 						} catch (SQLException sqle) {
 							System.err
 									.println("Something exploded running the insert: "
@@ -164,7 +157,7 @@ public class JdbcLoader {
 					psEvent.setString(1, actor.getLogin());
 					ResultSet rsEvent = psEvent.executeQuery();
 					while (rsEvent.next()) {
-						// Read values using column name
+
 						long actor_id = rsEvent.getLong("actor_id");
 
 						PreparedStatement stmtEvent = connection
@@ -182,7 +175,7 @@ public class JdbcLoader {
 						stmtEvent.setString(6, event.getUrl());
 						stmtEvent.executeUpdate();
 						stmtEvent.close();
-						System.out.println(stmtEvent);
+//						System.out.println(stmtEvent);
 					}
 				} catch (SQLException sqle) {
 					System.err
@@ -191,22 +184,17 @@ public class JdbcLoader {
 				}
 
 				n++;
-
 			}
 
-			long end = System.currentTimeMillis();
-
-			System.out.println("Data Uploaded.");
-			System.out.println("Total records " + n);
-
-			MongoUtil.printStat(begin, end);
-
+		} catch (Exception e) {
+			System.out.println("data upload fail!!");
 		} finally {
-
+			System.out.println("Subtotal records " + n);
 			closeConnection(connection);
 			reader.close();
-			return;
+
 		}
+		return n;
 	}
 
 	private static Connection getConnection() throws Exception {
