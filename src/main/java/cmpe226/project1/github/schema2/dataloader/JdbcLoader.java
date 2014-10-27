@@ -1,5 +1,6 @@
 package cmpe226.project1.github.schema2.dataloader;
 
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -14,6 +15,7 @@ import cmpe226.project1.github.schema2.model.EventSingle;
 import cmpe226.project1.github.schema2.model.EventMaper;
 import cmpe226.project1.github.schema2.model.RepositorySingle;
 import cmpe226.project1.util.MongoUtil;
+import cmpe226.project1.util.PostgresJdbcUtil;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
@@ -21,23 +23,22 @@ import com.google.gson.stream.JsonToken;
 
 // schema 2 , zero normal form.
 public class JdbcLoader {
+	
+	static String dataDir = System.getProperty("user.dir") + "/data/";
 
 	public static void main(String[] args) throws Exception {
-		String domain = "http://data.githubarchive.org/";
+		
 		int rows = 0;
+		System.out.println("\n**************Schema2 0 Normal Form**************");
+
 		long begin = System.currentTimeMillis();
-		System.out
-				.println("\n**************Schema2 0 Normal Form**************");
-
 		for (int i = 0; i < 24; i++) {
-			String url = "";
-
-			url += "2014-10-05-" + i + ".json.gz";
+			String filename ="2014-10-09-"+i+".json.gz";
 
 			try {
-				rows += JdbcLoader.loadArchive(domain + url);
+				rows += JdbcLoader.loadArchive(filename);
 			} catch (Exception e) {
-				// System.out.println("no data");
+				e.printStackTrace();
 			}
 
 		}
@@ -50,20 +51,19 @@ public class JdbcLoader {
 
 	}
 
-	@SuppressWarnings("finally")
-	public static int loadArchive(String url) throws Exception {
+	public static int loadArchive(String fn) throws Exception {
 		int n = 0;
 		JsonReader reader = null;
-		Connection connection = getConnection();
+		Connection connection = PostgresJdbcUtil.getDBconnection();
 		try {
-			InputStream inputStream = new URL(url).openStream();
+			InputStream inputStream = new FileInputStream(dataDir + fn);
 			Gson gson = new Gson();
 			InputStream gzipStream = new GZIPInputStream(inputStream);
 			reader = new JsonReader(new InputStreamReader(gzipStream, "UTF-8"));
 			reader.setLenient(true);
 
 			System.out
-					.println("Start Uploading for " + url + " to schema2-0NF");
+					.println("Start Uploading for " + fn + " to schema2-0NF");
 
 			while (reader.hasNext() && reader.peek() != JsonToken.END_DOCUMENT) {
 
@@ -121,26 +121,22 @@ public class JdbcLoader {
 //					System.out.println(stmt);
 
 				} catch (SQLException sqle) {
-					System.err
-							.println("Something exploded running the insert: "
+					System.err.println("Something exploded running the insert: "
 									+ sqle.getMessage());
 				}
-
 				n++;
-
 			}
 
 		} catch (Exception e) {
-			System.out.println("data file not found!");
+			System.out.println("data upload fail!!" + e.getMessage());
 		} finally {
-			System.out.println("Subtotal records " + n);
 			closeConnection(connection);
 			reader.close();
 		}
 		return n;
 	}
 
-	public static cmpe226.project1.github.schema2.model.EventSingle getNewEvent(
+	public static EventSingle getNewEvent(
 			EventMaper oldEvent) {
 		EventSingle newEvent = new EventSingle();
 
@@ -182,14 +178,6 @@ public class JdbcLoader {
 		newEvent.setEvent_type(oldEvent.getType());
 		newEvent.setEvent_url(oldEvent.getUrl());
 		return newEvent;
-	}
-
-	private static Connection getConnection() throws Exception {
-		Connection connection = null;
-		Class.forName("org.postgresql.Driver");
-		connection = DriverManager.getConnection(
-				"jdbc:postgresql://localhost:5432/lillianj", "Lillian", "");
-		return connection;
 	}
 
 	private static void closeConnection(Connection connection)

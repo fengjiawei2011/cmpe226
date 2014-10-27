@@ -1,5 +1,6 @@
 package cmpe226.project1.github.schema1.dataloader;
 
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -14,6 +15,7 @@ import cmpe226.project1.github.schema1.model.Actor;
 import cmpe226.project1.github.schema1.model.Event;
 import cmpe226.project1.github.schema1.model.Repository;
 import cmpe226.project1.util.MongoUtil;
+import cmpe226.project1.util.PostgresJdbcUtil;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
@@ -21,25 +23,24 @@ import com.google.gson.stream.JsonToken;
 
 // schema 1, Third Normal form
 public class JdbcLoader {
+	
+	static String dataDir = System.getProperty("user.dir") + "/data/";
 
 	public static void main(String[] args) throws Exception {
 
-		long begin = System.currentTimeMillis();
 		int records = 0;
-		System.out
-				.println("\n**************Schema1 3rd Normal Form**************");
+		System.out.println("\n**************Schema1 3rd Normal Form**************");
 
+		long begin = System.currentTimeMillis();
 		for (int i = 0; i < 24; i++) {
 			try {
-				String url = "http://data.githubarchive.org/2014-10-05-" + i
-						+ ".json.gz";
+				String filename ="2014-10-09-"+i+".json.gz";
 
-				records += JdbcLoader.loadArchive(url);
+				records += JdbcLoader.loadArchive(filename);
 
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
-				// e.printStackTrace();
-				// continue;
+				 e.printStackTrace();
 			}
 
 		}
@@ -52,21 +53,19 @@ public class JdbcLoader {
 		MongoUtil.printStat(begin, end);
 	}
 
-	@SuppressWarnings("finally")
-	public static int loadArchive(String url) throws Exception {
+	public static int loadArchive(String fn) throws Exception {
 
 		int n = 0;
 		JsonReader reader = null;
-		Connection connection = getConnection();
+		Connection connection = PostgresJdbcUtil.getDBconnection();
 		try {
-			InputStream inputStream = new URL(url).openStream();
+			InputStream inputStream = new FileInputStream(dataDir + fn);
 			Gson gson = new Gson();
 			InputStream gzipStream = new GZIPInputStream(inputStream);
 			reader = new JsonReader(new InputStreamReader(gzipStream, "UTF-8"));
 			reader.setLenient(true);
 
-			System.out
-					.println("Start Uploading for " + url + " to schema1-3NF");
+			System.out.println("Start Uploading for " + fn + " to schema1-3NF");
 			while (reader.hasNext() && reader.peek() != JsonToken.END_DOCUMENT) {
 
 				Event event = gson.fromJson(reader, Event.class);
@@ -90,12 +89,11 @@ public class JdbcLoader {
 							stmt.setString(6, actor.getLogin());
 							stmt.setString(7, actor.getName());
 							stmt.setString(8, actor.getType());
+//							System.out.println(stmt);
 							stmt.executeUpdate();
 							stmt.close();
-							// System.out.println(stmt);
 						} catch (SQLException sqle) {
-							System.err
-									.println("Something exploded running the insert: "
+							System.err.println("Something exploded running the insert: "
 											+ sqle.getMessage());
 						}
 
@@ -106,9 +104,6 @@ public class JdbcLoader {
 				Repository rep = event.getRepository();
 
 				if (rep != null) {
-					// TODO check whether the repository is in DB by "id", then
-					// save or update repository
-
 					PreparedStatement ps = connection
 							.prepareStatement("select repo_id from repository where repo_id = ?");
 					ps.setLong(1, rep.getId());
@@ -143,8 +138,7 @@ public class JdbcLoader {
 							stmt.close();
 							// System.out.println(stmt);
 						} catch (SQLException sqle) {
-							System.err
-									.println("Something exploded running the insert: "
+							System.err.println("Something exploded running the insert: "
 											+ sqle.getMessage());
 						}
 					}
@@ -178,31 +172,19 @@ public class JdbcLoader {
 //						System.out.println(stmtEvent);
 					}
 				} catch (SQLException sqle) {
-					System.err
-							.println("Something exploded running the insert: "
+					System.err.println("Something exploded running the insert: "
 									+ sqle.getMessage());
 				}
 
 				n++;
 			}
-
 		} catch (Exception e) {
-			System.out.println("data upload fail!!");
+			System.out.println("data upload fail!!" + e.getMessage());
 		} finally {
-			System.out.println("Subtotal records " + n);
 			closeConnection(connection);
 			reader.close();
-
 		}
 		return n;
-	}
-
-	private static Connection getConnection() throws Exception {
-		Connection connection = null;
-		Class.forName("org.postgresql.Driver");
-		connection = DriverManager.getConnection(
-				"jdbc:postgresql://localhost:5432/lillianj", "Lillian", "");
-		return connection;
 	}
 
 	private static void closeConnection(Connection connection)

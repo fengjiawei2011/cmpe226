@@ -91,14 +91,14 @@ public class Loader {
 			
 		} catch (Exception e) {
 			if (tx != null) tx.rollback();
-			System.out.println("data file not found!" + e.getMessage());
+			System.out.println("data upload fail!!" + e.getMessage());
 		}finally{
 			session.close();
 		}
 		return n;
 	}
 
-	public static cmpe226.project1.github.schema2.model.EventSingle getNewEvent(
+	public static EventSingle getNewEvent(
 			EventMaper oldEvent) {
 		EventSingle newEvent = new EventSingle();
 

@@ -15,7 +15,7 @@ public class Actor {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "actor_id", updatable = false, nullable = false)
+	@Column(name = "actor_id", columnDefinition = "serial", updatable = false, nullable = false)
 	private Long id;
 	
 	private String gravatar_id;

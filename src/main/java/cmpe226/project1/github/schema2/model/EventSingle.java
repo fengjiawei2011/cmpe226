@@ -15,7 +15,7 @@ public class EventSingle {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "event_id", updatable = false, nullable = false)
+	@Column(name = "event_id", columnDefinition = "serial", updatable = false, nullable = false)
 	private Long event_id;
 	
 	@Column(length = 1024)

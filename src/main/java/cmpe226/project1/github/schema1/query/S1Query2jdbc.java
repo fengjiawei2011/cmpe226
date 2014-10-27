@@ -38,7 +38,7 @@ public class S1Query2jdbc {
 	    		+ "where r.repo_id=e.repo_id and e.actor_id=a.actor_id "
 	    		+ "group by r.language "
 	    		+ "order by number_of_users desc "
-	    		+ "limit 1";
+	    		+ "limit 2";
 	    PreparedStatement ps=conn.prepareStatement(sql);
 	    ResultSet rs = ps.executeQuery();
 	    while (rs.next()) {
