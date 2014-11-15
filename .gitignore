@@ -7,7 +7,7 @@ target/
 =======
 *.json
 *.gz
-*.json.gz
+
 >>>>>>> Stashed changes
 # ignore changes to hibernate config file
 hibernate.cfg.xml
