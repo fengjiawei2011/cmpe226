@@ -1,13 +1,13 @@
 
 # plot time
-data = read.csv("~/Documents/EclipseWS/CMPE226_Project/plot/q3-time.csv", sep=",")
+data = read.csv("~/Documents/EclipseWS/CMPE226_Project/plot/load-time.csv", sep=",")
 header = names(data)
 colors = rainbow(3)
 
 total = data[,1]
 time1 = data[,2]
 
-plot(total, time1, type= "n", main="Query3", xlab = "Total number of records", ylab = "Time used (sec)",bty='L', ylim=c(0,50))
+plot(total, time1, type= "n", main="Query3", xlab = "Total number of records", ylab = "Time used (sec)",bty='L', ylim=c(0,500))
 
 colors = c(colors[1], colors[1], colors[3],colors[3])
 linetype = c(1,2,1,2)
@@ -55,3 +55,23 @@ for (i in 2:9){
 
 legend('topleft', legend = header[2:5], col = colors[1:4], lty=linetype[1:4], bty="n")
 legend('topright', legend = header[6:9], col = colors[5:8], lty=linetype[5:8], bty="n")
+
+# plot time * CPU
+time = read.csv("~/Documents/EclipseWS/CMPE226_Project/plot/load-time.csv", sep=",")
+cpu = read.csv("~/Documents/EclipseWS/CMPE226_Project/plot/load-cpu.csv", sep=",")
+header = names(data)
+colors = rainbow(3)
+
+total = data[,1]
+time1 = data[,2]
+
+plot(total, time1, type= "n", main="Load Data", xlab = "Total number of records", ylab = "Time (sec) * CPU (%)",bty='L', ylim=c(15000,300000), yaxs="i")
+
+colors = c(colors[1], colors[1], colors[3],colors[3])
+linetype = c(1,2,1,2)
+for (i in 2:5){
+  print(header[i])
+  lines(total, time[, i] * cpu[, i]/1000, type ="o", lty = linetype[i-1], col=colors[i-1], pch=16)
+}
+
+legend('topleft', legend = header[2:5], col = colors, lty=linetype, bty="n")
