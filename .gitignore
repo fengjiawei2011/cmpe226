@@ -2,12 +2,9 @@ target/
 .project
 .settings/
 .classpath
-<<<<<<< Updated upstream
 
-=======
+data/
 *.json
 *.gz
-
->>>>>>> Stashed changes
 # ignore changes to hibernate config file
 hibernate.cfg.xml
