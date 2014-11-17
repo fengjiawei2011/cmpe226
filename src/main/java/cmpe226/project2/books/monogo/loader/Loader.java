@@ -30,6 +30,7 @@ public class Loader {
 	public void read(File file) throws FileNotFoundException {
 		BasicDBObject book = new BasicDBObject();
 		BasicDBObject bookMateData = new BasicDBObject();
+		BasicDBObject fileMateData = new BasicDBObject();
 
 		BufferedReader reader = new BufferedReader(new FileReader(file));
 		String line = null;
