@@ -17,16 +17,19 @@ import java.util.regex.Pattern;
  * Note: Errors in file's information part: 
  *  1104.txt: Change "Tile:" to "Title:"
  *  1922.txt.: Change "Author" to "Title" and "Title" to "Author
+ *  
+ * Usage: new BookParser(file_path).processLineByLine()
+ * Return: HashMap<String, String>
  */
 public class BookParser {
 	private final Path filePath;
 	private final static Charset ENCODING = StandardCharsets.UTF_8;
 	private HashMap<String, String> info = new HashMap<>();
-	private Pattern start = Pattern.compile("^Title:.*");
-	private Pattern end = Pattern.compile(".*\\*");
-	private Pattern keyValue = Pattern.compile("([^:\\[]*):([^\\[\\]]*).*");
-	private Pattern date = Pattern.compile("([a-zA-Z]+\\s*\\d*\\s*,\\s*\\d+)");
-	private Pattern author = Pattern.compile("(?:by\\s)?(?:\\(.*\\))?(((?!\\sand|,|\\().)*)((?:\\(.*\\)\\s)(.+))?");
+	private final static Pattern start = Pattern.compile("^Title:.*");
+	private final static Pattern end = Pattern.compile(".*\\*");
+	private final static Pattern keyValue = Pattern.compile("([^:\\[]*):([^\\[\\]]*).*");
+	private final static Pattern date = Pattern.compile("([a-zA-Z]+\\s*\\d*\\s*,\\s*\\d+)");
+	private final static Pattern author = Pattern.compile("(?:by\\s)?(?:\\(.*\\))?(((?!\\sand|,|\\().)*)((?:\\(.*\\)\\s)(.+))?");
 
 	public BookParser(String path) {
 		filePath = Paths.get(path);
@@ -39,9 +42,9 @@ public class BookParser {
 			while (scanner.hasNextLine()) {
 				String line = scanner.nextLine().trim();
 				if (line.equals("")) {
-					System.out.println("[Empty Line]");
+//					System.out.println("[Empty Line]");
 				} else if (start.matcher(line).matches()) {
-					System.out.println("[Start Parse]");
+//					System.out.println("[Start Parse]");
 					processLine(line);
 					break;
 				}
@@ -51,10 +54,10 @@ public class BookParser {
 			while (scanner.hasNextLine()) {
 				String line = scanner.nextLine().trim();
 				if (line.equals("")) {
-					System.out.println("[Empty line]");
+//					System.out.println("[Empty line]");
 				} else if (end.matcher(line).matches()) {
-					System.out.println(line);
-					System.out.println("[End Parse]");
+//					System.out.println(line);
+//					System.out.println("[End Parse]");
 					break;
 				} else {
 					processLine(line);
@@ -66,35 +69,35 @@ public class BookParser {
 		}
 		
 		// clean author: by, and, (...), keep first author
-		if (info.containsKey("Author")) {
-			Matcher authorMatcher = author.matcher(info.get("Author"));
+		if (info.containsKey("author")) {
+			Matcher authorMatcher = author.matcher(info.get("author"));
 			
 			if (authorMatcher.find()) {
 				String firstAuthor = authorMatcher.group(1).trim();
 				String tmp = authorMatcher.group(4);
 				if (tmp != null)
 					firstAuthor += " " + tmp;
-				info.put("First Author", firstAuthor);
+				info.put("first_author", firstAuthor);
 			}
 		}
 		else {
-			info.put("Author", "No Author");
+			info.put("author", "No Author");
 		}
 		return info;
 	}
 
 	private void processLine(String line) {
-		System.out.println("[Process]" + line);
+//		System.out.println("[Process]" + line);
 		Matcher matcher = keyValue.matcher(line);
 		if (matcher.matches() && matcher.groupCount() == 2) {
-			info.put(matcher.group(1).trim(), matcher.group(2).trim());
-		} else if (!info.containsKey("Release Date")) {
+			info.put(matcher.group(1).trim().toLowerCase().replace(" ", "_"), matcher.group(2).trim());
+		} else if (!info.containsKey("release_date")) {
 			// find date
-			System.out.println("Date Matching...");
+//			System.out.println("Date Matching...");
 			Matcher dateMatcher = date.matcher(line);
 			if (dateMatcher.find()) {
-				System.out.println("[Date] " + dateMatcher.group(1));
-				info.put("Release Date", dateMatcher.group(1));
+//				System.out.println("[Date] " + dateMatcher.group(1));
+				info.put("release_date", dateMatcher.group(1));
 			}
 		}
 	}
