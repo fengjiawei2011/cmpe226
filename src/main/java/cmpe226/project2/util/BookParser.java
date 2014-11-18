@@ -90,7 +90,15 @@ public class BookParser {
 //		System.out.println("[Process]" + line);
 		Matcher matcher = keyValue.matcher(line);
 		if (matcher.matches() && matcher.groupCount() == 2) {
-			info.put(matcher.group(1).trim().toLowerCase().replace(" ", "_"), matcher.group(2).trim());
+			String key = matcher.group(1).trim().toLowerCase().replace(" ", "_");
+			// abandon long keys
+			if (key.length() < 23) {
+				info.put(key, matcher.group(2).trim());
+			}
+			else {
+				System.out.println("[Abandon] " + key);
+			}
+			
 		} else if (!info.containsKey("release_date")) {
 			// find date
 //			System.out.println("Date Matching...");

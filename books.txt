@@ -83,21 +83,18 @@ author : Dante Alighieri
 title : Divina Commedia di Dante: Inferno
 release_date : August, 1997
 first_author : Dante Alighieri
-the_project_gutenberg_etext_"divina_commedia_di_dante : Inferno"
 
 1010.txt
 author : Dante Alighieri
 title : Divina Commedia di Dante:  Purgatorio
 release_date : August, 1997
 first_author : Dante Alighieri
-project_gutenberg's_etext_"divina_commedia_di_dante : Purgatorio"
 
 1011.txt
 author : Dante Alighieri
 title : Divina Commedia di Dante: Paradiso
 release_date : August, 1997
 first_author : Dante Alighieri
-the_project_gutenberg_etext_"divina_commedia_di_dante : Paradiso"
 
 1012.txt
 author : Dante Alighieri
@@ -680,7 +677,6 @@ author : Lewis Roth
 title : Baartock
 release_date : October, 1997
 first_author : Lewis Roth
-here_is_a_short_message_from_the_author_of_baartock : 
 
 1088.txt
 author : Ernest Thompson Seton
@@ -1101,7 +1097,6 @@ author : Anthony Hope
 title : Rupert of Hentzau
 posting_date : August 3, 2008
 release_date : December, 1997
-from_the_memoirs_of_fritz_von_tarlenheim : The Sequel to
 first_author : Anthony Hope
 language : English
 
@@ -2173,7 +2168,6 @@ first_author : John Masefield
 language : English
 
 1275.txt
-project_gutenberg_etext : Alexandria and her Schools by Kingsley
 author : Charles Kingsley
 title : Alexandria and her Schools
 release_date : April, 1998
@@ -3562,7 +3556,6 @@ title : The Voice of the City
 release_date : September, 1998
 first_author : O. Henry
 language : English
-further_stories_of_the_four_million : The Voice of the City -- The Complete Life of John Hopkins -- A Lickpenny Lover -- Dougherty's Eye-Opener -- "Little Speck in Garnered Fruit" -- The Harbinger -- While the Auto Waits -- A Comedy in Rubber -- One Thousand Dollars -- The Defeat of the City -- The Shocks of Doom -- The Plutonian Fire -- Nemesis and the Candy Man -- Squaring the Circle -- Roses, Ruses and Romance -- The City of Dreadful Night -- The Easter of the Soul -- The Fool-Killer -- Transients in Arcadia -- The Rathskeller and the Rose -- The Clarion Call -- Extradited from Bohemia -- A Philistine in Bohemia -- From Each According to His Ability -- The Memento
 
 1445.txt
 author : J. S. Zerbe
@@ -3741,7 +3734,6 @@ language : English
 1464.txt
 author : Charles Dickens
 title : Contributions to All The Year Round
-project_gutenberg_etext_of_contributions_to : All The Year Round
 release_date : September, 1998
 first_author : Charles Dickens
 
@@ -7779,7 +7771,6 @@ character_set_encoding : ISO-646-US (US-ASCII)
 release_date : April 29, 2005
 first_author : Andrew Lang
 language : English
-***start_of_the_project_gutenberg_ebook_tales_of_troy : ULYSSES THE SACKER
 
 1974.txt
 author : Aristotle
@@ -8839,7 +8830,6 @@ title : How to Analyze People on Sight
 release_date : December 4, 2009
 first_author : Elsie Lincoln Benedict
 language : English
-through_the_science_of_human_analysis : The Five Human Types
 
 3070.txt
 author : Arthur Conan Doyle
