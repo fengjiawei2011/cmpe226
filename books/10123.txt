@@ -18,7 +18,7 @@ Release Date: November 18, 2003  [eBook #10123]
 
 Language: English
 
-Chatacter set encoding: US-ASCII
+Character set encoding: US-ASCII
 
 
 ***START OF THE PROJECT GUTENBERG EBOOK AUNT JANE'S NIECES***

@@ -151,11 +151,12 @@ public class DataLoader {
 	}
 
 	public void loadData() throws IOException {
-		String[] books = new File("/Users/lan/Desktop/226/books/").list(); // { "1010.txt" }; 
+		String bookDir = System.getProperty("user.dir") + "/books/";
+		String[] books = new File(bookDir).list(); // { "1010.txt" }; 
 		int count = 0;
 
 		for (String book : books) {
-			String book_path = "/Users/lan/Desktop/226/books/" + book;
+			String book_path = bookDir + book;
 			BookParser parser = new BookParser(book_path);
 			insert(parser.processLineByLine(), book_path);
 			count++;
