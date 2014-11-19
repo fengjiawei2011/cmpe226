@@ -1,7 +1,11 @@
 package cmpe226.project2.books.cassandra;
 
+import java.util.Collection;
+
 import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.ProtocolVersion;
 import com.datastax.driver.core.Session;
+import com.datastax.driver.core.UserType;
 
 /*
  * Cassandra 2.1.2
@@ -13,8 +17,16 @@ public class CassandraClient {
 
 	public CassandraClient(String node) {
 		System.out.println("[Build connection]");
-		cluster = Cluster.builder().addContactPoint(node).build();
+		cluster = Cluster.builder().withProtocolVersion(ProtocolVersion.V3)
+				.addContactPoint(node).build();
 		session = cluster.connect();
+		
+//		Collection<UserType> types = cluster.getMetadata().getKeyspace("cmpe226").getUserTypes();
+//		System.out.println(types);
+//		for (UserType type : types) {
+//			System.out.println(type.getFieldNames());
+//		}
+		
 	}
 
 	public Session getSession() {

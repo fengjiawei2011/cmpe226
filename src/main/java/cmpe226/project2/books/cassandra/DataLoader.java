@@ -28,16 +28,17 @@ import com.datastax.driver.core.utils.UUIDs;
  * Create schema
  * Load data from file to db
  * Download file from db
- * 
+ * Add comments
+ * Add rating
  */
 public class DataLoader {
-
-	private String keyspace = "cmpe226";
-	private String bookTable = "books";
-	private String userTable = "users";
-	private String commentType = "comment";
-	private String readType = "read";
-
+	
+	private final static String keyspace = "cmpe226";
+	private final static String bookTable = "books";
+	private final static String userTable = "users";
+	private final static String commentType = "comment";
+	private final static String readType = "read";
+	
 	private Session session;
 
 	public DataLoader(Session session) {
@@ -177,7 +178,6 @@ public class DataLoader {
 	// insert comments
 	public void insertComment(UUID book_id, UUID user_id, String comment) throws InterruptedException {
 		UserType commentT = session.getCluster().getMetadata().getKeyspace(keyspace).getUserType(commentType);
-		System.out.println(commentT.getFieldNames());
 		
 		UDTValue c = commentT.newValue()
 				.setUUID("user_id", user_id)
@@ -189,6 +189,46 @@ public class DataLoader {
 				.where(QueryBuilder.eq("id", book_id));
 		
 		session.execute(statement);
+		System.out.println("[Comment added]");
+	}
+	
+	// insert book rating
+	public void insertRate(UUID book_id, UUID user_id, Double rating) throws InterruptedException {
+		// update book rating
+		Statement getRate = QueryBuilder.select("avg_rate", "count_rate").from(keyspace, bookTable).where(QueryBuilder.eq("id", book_id));
+		Row file = session.execute(getRate).one();
+		
+		if (file != null) {
+			Double rate = file.getDouble("avg_rate");
+			int count = file.getInt("count_rate");
+			
+			rate = (rate * count + rating)/(++count);
+			Statement updateRate = QueryBuilder.update(keyspace, bookTable)
+					.with(QueryBuilder.set("count_rate", count))
+					.and(QueryBuilder.set("avg_rate", rate))
+					.where(QueryBuilder.eq("id", book_id));
+			
+			UserType readT = session.getCluster().getMetadata().getKeyspace(keyspace).getUserType(readType);
+			
+			UDTValue r = readT.newValue()
+					.setUUID("book_id", book_id)
+					.setDouble("rating", rating)
+					.setDate("rate_date", new Date());
+			
+			Statement addComment = QueryBuilder.update(keyspace, userTable)
+					.with(QueryBuilder.add("read_books", r))
+					.where(QueryBuilder.eq("id", user_id));
+			
+			BatchStatement bs = new BatchStatement(BatchStatement.Type.UNLOGGED)
+					.add(addComment).add(updateRate);
+			
+			session.execute(bs);
+			System.out.println("[Read added]");
+			
+		} else {
+
+			System.out.println("[Book NOT Found]");
+		}
 	}
 
 	public static void main(String[] args) throws IOException, InterruptedException {
@@ -205,8 +245,15 @@ public class DataLoader {
 //			loader.loadData(System.getProperty("user.dir") + "/books/");
 			
 			// add comment
-			loader.insertComment(UUID.fromString("abd17db3-bc4f-4c5e-a096-3968d64a1bc7"), 
-					UUID.fromString("415394aa-2e1f-4d75-a7d1-ed5202b51e9d"), "comment test");
+//			loader.insertComment(UUID.fromString("57c7b668-6679-4b29-9d3e-79692d2e379d"), 
+//					UUID.fromString("82ea5a75-8df9-4093-89c6-6b3c42f39745"), "comment test2");
+			
+			// add rating
+			loader.insertRate(UUID.fromString("390375ea-6aae-4d5e-bff4-1213168f4907"), 
+					UUID.fromString("79bcdc0f-f8b1-4319-96f5-68c2fff57931"), 4.5);
+			
+			loader.insertRate(UUID.fromString("390375ea-6aae-4d5e-bff4-1213168f4907"), 
+					UUID.fromString("48f2aba7-5719-405a-aa95-2c7fa39bb0b5"), 3.0);
 			
 //			loader.readBook(UUID.fromString("372d532e-20f2-456c-ab1d-217b8ead54c6"));
 			
