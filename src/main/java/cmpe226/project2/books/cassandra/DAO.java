@@ -26,7 +26,7 @@ import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.datastax.driver.core.utils.UUIDs;
 
 /*
- * Create schema:				new DataLoader(seesion)
+ * Create schema:				new DAO(seesion)
  * Recreate shcema: 			recreateKeyspace()
  * Load data from file to db: 	loadData(folder_path)
  * Download file from db: 		getBook(UUID id)
@@ -34,7 +34,7 @@ import com.datastax.driver.core.utils.UUIDs;
  * Add comment: 				insertComment(UUID book_id, UUID user_id, String comment)
  * Add rating: 					insertRate(UUID book_id, UUID user_id, Double rating)
  */
-public class DataLoader {
+public class DAO {
 	
 	private final static String keyspace = "cmpe226";
 	private final static String bookTable = "books";
@@ -46,7 +46,7 @@ public class DataLoader {
 	
 	private Session session;
 
-	public DataLoader(Session session) {
+	public DAO(Session session) {
 		this.session = session;
 		init();
 	}
@@ -259,25 +259,25 @@ public class DataLoader {
 		CassandraClient client = new CassandraClient("localhost");
 		
 		try {
-			DataLoader loader = new DataLoader(client.getSession());
+			DAO dao = new DAO(client.getSession());
 			
-//			loader.insertUser("Bugy");
+//			dao.insertUser("Bugy");
 			
 			// recreate schema
-//			loader.recreateKeyspace();
+//			dao.recreateKeyspace();
 			
 			// load all files under folder
-//			loader.loadData(System.getProperty("user.dir") + "/books/");
+//			dao.loadData(System.getProperty("user.dir") + "/books/");
 			
 			// add comment
-//			loader.insertComment(UUID.fromString("ce0c57af-f563-4ecb-ab8a-76f3bd5fdd6b"), 
+//			dao.insertComment(UUID.fromString("ce0c57af-f563-4ecb-ab8a-76f3bd5fdd6b"), 
 //					UUID.fromString("3c0afa81-5ba8-4c29-99a8-366445f12d7a"), "comment test");
 			
 			// add rating
-//			loader.insertRate(UUID.fromString("ce0c57af-f563-4ecb-ab8a-76f3bd5fdd6b"), 
+//			dao.insertRate(UUID.fromString("ce0c57af-f563-4ecb-ab8a-76f3bd5fdd6b"), 
 //					UUID.fromString("3c0afa81-5ba8-4c29-99a8-366445f12d7a"), 4.5);
 			
-//			loader.getBook(UUID.fromString("372d532e-20f2-456c-ab1d-217b8ead54c6"));
+//			dao.getBook(UUID.fromString("372d532e-20f2-456c-ab1d-217b8ead54c6"));
 			
 		} finally {
 			client.close();
