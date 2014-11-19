@@ -1,5 +1,7 @@
 package cmpe226.project2.books.cassandra;
 
+import cmpe226.project2.util.BookParser;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -11,9 +13,8 @@ import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.UUID;
 
-import cmpe226.project2.util.BookParser;
-
 import com.datastax.driver.core.BatchStatement;
+import com.datastax.driver.core.KeyspaceMetadata;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.Statement;
@@ -25,11 +26,13 @@ import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.datastax.driver.core.utils.UUIDs;
 
 /*
- * Create schema
- * Load data from file to db
- * Download file from db
- * Add comments
- * Add rating
+ * Create schema:				new DataLoader(seesion)
+ * Recreate shcema: 			recreateKeyspace()
+ * Load data from file to db: 	loadData(folder_path)
+ * Download file from db: 		getBook(UUID id)
+ * Add user:					insertUser(String name)
+ * Add comment: 				insertComment(UUID book_id, UUID user_id, String comment)
+ * Add rating: 					insertRate(UUID book_id, UUID user_id, Double rating)
  */
 public class DataLoader {
 	
@@ -37,16 +40,24 @@ public class DataLoader {
 	private final static String bookTable = "books";
 	private final static String userTable = "users";
 	private final static String commentType = "comment";
-	private final static String readType = "read";
+	private final static String rateType = "read";
+	private UserType commentT;
+	private UserType readT;
 	
 	private Session session;
 
 	public DataLoader(Session session) {
 		this.session = session;
+		init();
 	}
 
+	public void recreateKeyspace() {
+		session.execute("DROP KEYSPACE " + keyspace);
+		init();
+	}
+	
 	// create keyspace and table
-	public void init() {
+	private void init() {
 		String createKeyspace = String
 				.format("CREATE KEYSPACE IF NOT EXISTS %s WITH replication = {'class':'SimpleStrategy', 'replication_factor':1};",
 						keyspace);
@@ -57,9 +68,9 @@ public class DataLoader {
 						keyspace, commentType);
 
 		// create read type
-		String createReadType = String
+		String createRateType = String
 				.format("CREATE TYPE IF NOT EXISTS %s.%s (book_id uuid, rating double, rate_date timestamp);",
-						keyspace, readType);
+						keyspace, rateType);
 
 		// create book table with basic information
 		String createBookTable = String
@@ -68,23 +79,23 @@ public class DataLoader {
 
 		String createUserTable = String
 				.format("CREATE TABLE IF NOT EXISTS %s.%s (id uuid PRIMARY KEY, name text, read_books set<frozen<%s>>, write_books set<uuid>);",
-						keyspace, userTable, readType);
+						keyspace, userTable, rateType);
 		
 		String createUserNameIndex = String
 				.format("CREATE INDEX IF NOT EXISTS user_name ON %s.%s (name);", keyspace, userTable);
-
+		
 		session.execute(createKeyspace);
 		session.execute(createCommentType);
-		session.execute(createReadType);
+		session.execute(createRateType);
 		session.execute(createBookTable);
 		session.execute(createUserTable);
 		session.execute(createUserNameIndex);
+		
+		KeyspaceMetadata km = session.getCluster().getMetadata().getKeyspace(keyspace);
+		commentT = km.getUserType(commentType);
+		readT = km.getUserType(rateType);
 	}
-
-	public void dropKeyspace() {
-		session.execute("DROP KEYSPACE " + keyspace);
-	}
-
+	
 	private void addColumn(String table, String column, String type) {
 		try {
 			String addCol = String.format("ALTER TABLE %s.%s ADD %s %s",
@@ -97,7 +108,7 @@ public class DataLoader {
 		}
 	}
 
-	public Statement updateOrInsertUser(String name, UUID book_id) {
+	private Statement updateOrInsertAuthor(String name, UUID book_id) {
 		Row user = session.execute(
 				QueryBuilder.select("id").from(keyspace, userTable)
 						.where(QueryBuilder.eq("name", name)).limit(1)).one();
@@ -120,7 +131,7 @@ public class DataLoader {
 		return statement;
 	}
 
-	public void insert(String file_path) throws IOException {
+	private void insertBook(String file_path) throws IOException {
 		HashMap<String, String> data = new BookParser(file_path).processLineByLine();
 		
 		UUID book_id = UUIDs.random();
@@ -133,7 +144,7 @@ public class DataLoader {
 		}
 		
 		String name = data.get("first_author");
-		Statement userUpdate = updateOrInsertUser(name, book_id);
+		Statement userUpdate = updateOrInsertAuthor(name, book_id);
 
 		BatchStatement bs = new BatchStatement(BatchStatement.Type.UNLOGGED)
 				.add(insertBook).add(userUpdate);
@@ -148,7 +159,7 @@ public class DataLoader {
 		}
 	}
 	
-	public void readBook(UUID id) throws IOException {
+	public void getBook(UUID id) throws IOException {
 		Statement readFile = QueryBuilder.select("content", "title").from(keyspace, bookTable).where(QueryBuilder.eq("id", id));
 		Row file = session.execute(readFile).one();
 
@@ -169,16 +180,31 @@ public class DataLoader {
 		int count = 0;
 
 		for (String book : books) {
-			insert(bookDir + book);
+			insertBook(bookDir + book);
 			count++;
 		}
 		System.out.printf("%d books loaded.", count);
 	}	
 	
+	// add user
+	public void insertUser(String name) {
+		Row user = session.execute(
+				QueryBuilder.select("id").from(keyspace, userTable)
+						.where(QueryBuilder.eq("name", name)).limit(1)).one();
+		
+		if (user == null) {
+			// insert user
+			Statement statement = QueryBuilder.insertInto(keyspace, userTable)
+					.value("id", UUIDs.random()).value("name", name);
+			session.execute(statement);
+			
+		} else {
+			System.out.println("User Already Exists");
+		}
+	}
+	
 	// insert comments
 	public void insertComment(UUID book_id, UUID user_id, String comment) throws InterruptedException {
-		UserType commentT = session.getCluster().getMetadata().getKeyspace(keyspace).getUserType(commentType);
-		
 		UDTValue c = commentT.newValue()
 				.setUUID("user_id", user_id)
 				.setString("comment", comment)
@@ -208,8 +234,6 @@ public class DataLoader {
 					.and(QueryBuilder.set("avg_rate", rate))
 					.where(QueryBuilder.eq("id", book_id));
 			
-			UserType readT = session.getCluster().getMetadata().getKeyspace(keyspace).getUserType(readType);
-			
 			UDTValue r = readT.newValue()
 					.setUUID("book_id", book_id)
 					.setDouble("rating", rating)
@@ -223,7 +247,7 @@ public class DataLoader {
 					.add(addComment).add(updateRate);
 			
 			session.execute(bs);
-			System.out.println("[Read added]");
+			System.out.println("[Rating added]");
 			
 		} else {
 
@@ -237,25 +261,23 @@ public class DataLoader {
 		try {
 			DataLoader loader = new DataLoader(client.getSession());
 			
-//			// init schema
-//			loader.dropKeyspace();
-//			loader.init();
-//			
-//			// load all files under folder
+//			loader.insertUser("Bugy");
+			
+			// recreate schema
+//			loader.recreateKeyspace();
+			
+			// load all files under folder
 //			loader.loadData(System.getProperty("user.dir") + "/books/");
 			
 			// add comment
-//			loader.insertComment(UUID.fromString("57c7b668-6679-4b29-9d3e-79692d2e379d"), 
-//					UUID.fromString("82ea5a75-8df9-4093-89c6-6b3c42f39745"), "comment test2");
+//			loader.insertComment(UUID.fromString("ce0c57af-f563-4ecb-ab8a-76f3bd5fdd6b"), 
+//					UUID.fromString("3c0afa81-5ba8-4c29-99a8-366445f12d7a"), "comment test");
 			
 			// add rating
-			loader.insertRate(UUID.fromString("390375ea-6aae-4d5e-bff4-1213168f4907"), 
-					UUID.fromString("79bcdc0f-f8b1-4319-96f5-68c2fff57931"), 4.5);
+//			loader.insertRate(UUID.fromString("ce0c57af-f563-4ecb-ab8a-76f3bd5fdd6b"), 
+//					UUID.fromString("3c0afa81-5ba8-4c29-99a8-366445f12d7a"), 4.5);
 			
-			loader.insertRate(UUID.fromString("390375ea-6aae-4d5e-bff4-1213168f4907"), 
-					UUID.fromString("48f2aba7-5719-405a-aa95-2c7fa39bb0b5"), 3.0);
-			
-//			loader.readBook(UUID.fromString("372d532e-20f2-456c-ab1d-217b8ead54c6"));
+//			loader.getBook(UUID.fromString("372d532e-20f2-456c-ab1d-217b8ead54c6"));
 			
 		} finally {
 			client.close();
