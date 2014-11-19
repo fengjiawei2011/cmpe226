@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 public class BookParser {
 	private final Path filePath;
 	private final static Charset ENCODING = StandardCharsets.UTF_8;
-	private HashMap<String, String> info = new HashMap<>();
+	private HashMap<String, String> info = new HashMap<String, String>();
 	private final static Pattern start = Pattern.compile("^Title:.*");
 	private final static Pattern end = Pattern.compile(".*\\*");
 	private final static Pattern keyValue = Pattern.compile("([^:\\[]*):([^\\[\\]]*).*");

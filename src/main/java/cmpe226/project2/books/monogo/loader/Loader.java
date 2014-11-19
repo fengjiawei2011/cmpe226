@@ -7,41 +7,51 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import cmpe226.project2.books.monogo.schema.Book;
+import cmpe226.project2.util.MongoDB;
 
 import com.mongodb.BasicDBObject;
 
 public class Loader {
-	private final static String FILES_PATH = "/Users/frank_feng1/Downloads/books/";
+	private final static String FILES_PATH = "/Users/frank/Documents/projects/java/cmpe226/books/";
 	private final static int READ_LINES_THRESHOLD = 40;
+	private MongoDB db;
+	
 	public static void main(String[] args) {
 		File directory = new File(FILES_PATH);
 		File[] files = directory.listFiles();
 		Loader loader = new Loader();
+		MongoDB db = new MongoDB("books");
 		try {
 			for (File f : files) {
-				loader.read(f);
-				//System.out.println("***************************************");
+				BasicDBObject book = loader.read(f);
+				String id = db.saveBookToGridFS(f);
+				((BasicDBObject)book.get(Book.MATEDATA)).put(Book.FILE_MATEDATA, id);
+				
+				System.out.println(book);
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
 	}
 
-	public void read(File file) throws FileNotFoundException {
+	public BasicDBObject read(File file) throws FileNotFoundException {
 		BasicDBObject book = new BasicDBObject();
 		BasicDBObject bookMateData = new BasicDBObject();
-		BasicDBObject fileMateData = new BasicDBObject();
+		//BasicDBObject fileMateData = new BasicDBObject();
 
 		BufferedReader reader = new BufferedReader(new FileReader(file));
 		String line = null;
-		Boolean contentStart = false;
+		//Boolean contentStart = false;
 		int i = 0;
 		try {
-			String bContent = "";
+			//String bContent = "";
 			while ((line = reader.readLine()) != null) {
-				if((i++) <= READ_LINES_THRESHOLD) 
+				if((i++) <= READ_LINES_THRESHOLD) {
 					parseMatedata(line, bookMateData);
-				
+				}else{
+					break;
+				}
+					
 //				line = line.toLowerCase().trim();
 //				
 //				if(contentStart)
@@ -51,18 +61,16 @@ public class Loader {
 //					contentStart = true;					
 			}
 			
-			if( bContent.length() == 0 )
-				System.out.println("The file parse fails to parse content --->"+file.getName());
-			
-			
-			book.put(Book.MATEDATA, new BasicDBObject(Book.BOOk_MATEDATA, bookMateData ));
-			((BasicDBObject)book.get(Book.MATEDATA)).put(Book.FILE_MATEDATA, new BasicDBObject("size", 111));
-			book.append(Book.MATEDATA_CONTENT, bContent);
-			System.out.println(book);
+//			if( bContent.length() == 0 )
+//				System.out.println("The file parse fails to parse content --->"+file.getName());
+		
+			book.put(Book.MATEDATA, bookMateData);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		return book;
 	}
 	
 	public void parseMatedata(String line,BasicDBObject matedata ){
@@ -97,5 +105,7 @@ public class Loader {
 			matedata.append(Book.MATEDATA_TRANSLATOR, value);
 			//System.out.println(line);
 		}
+		
+		//System.out.println(book);
 	}
 }
