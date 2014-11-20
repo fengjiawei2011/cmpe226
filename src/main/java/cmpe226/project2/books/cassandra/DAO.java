@@ -40,9 +40,9 @@ public class DAO {
 	private final static String bookTable = "books";
 	private final static String userTable = "users";
 	private final static String commentType = "comment";
-	private final static String rateType = "read";
+	private final static String rateType = "rate";
 	private UserType commentT;
-	private UserType readT;
+	private UserType rateT;
 	
 	private Session session;
 
@@ -67,7 +67,7 @@ public class DAO {
 				.format("CREATE TYPE IF NOT EXISTS %s.%s (user_id uuid, comment text, post_date timestamp);",
 						keyspace, commentType);
 
-		// create read type
+		// create rate type
 		String createRateType = String
 				.format("CREATE TYPE IF NOT EXISTS %s.%s (book_id uuid, rating double, rate_date timestamp);",
 						keyspace, rateType);
@@ -93,7 +93,7 @@ public class DAO {
 		
 		KeyspaceMetadata km = session.getCluster().getMetadata().getKeyspace(keyspace);
 		commentT = km.getUserType(commentType);
-		readT = km.getUserType(rateType);
+		rateT = km.getUserType(rateType);
 	}
 	
 	private void addColumn(String table, String column, String type) {
@@ -234,7 +234,7 @@ public class DAO {
 					.and(QueryBuilder.set("avg_rate", rate))
 					.where(QueryBuilder.eq("id", book_id));
 			
-			UDTValue r = readT.newValue()
+			UDTValue r = rateT.newValue()
 					.setUUID("book_id", book_id)
 					.setDouble("rating", rating)
 					.setDate("rate_date", new Date());
