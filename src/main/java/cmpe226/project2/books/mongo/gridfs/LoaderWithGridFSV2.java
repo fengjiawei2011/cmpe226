@@ -95,13 +95,6 @@ public class LoaderWithGridFSV2 {
 	}
 	
 	
-	public static void findAndSaveToLocal(String bookmd5, String savePath, String saveName) throws IOException{
-		GridFS gfsBooks = new GridFS(db, "books");
-		GridFSDBFile imageForOutput = gfsBooks.findOne(new BasicDBObject("md5",bookmd5));
-		String newFile=savePath+saveName;
-		imageForOutput.writeTo(newFile); //output to new file
-	}
-
 
 	public static void saveMeta(HashMap<String, String> metadata,
 								String md5, DBCollection metacollection){
