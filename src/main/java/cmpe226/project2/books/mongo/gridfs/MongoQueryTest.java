@@ -4,13 +4,8 @@ import java.io.IOException;
 
 import cmpe226.project2.util.MongoDB;
 
-import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
 import com.mongodb.Mongo;
-import com.mongodb.gridfs.GridFS;
-import com.mongodb.gridfs.GridFSDBFile;
 
 public class MongoQueryTest {
 
@@ -25,6 +20,7 @@ public class MongoQueryTest {
 	}
 	
 	
+	@SuppressWarnings("deprecation")
 	public void downloadByMd5Test() throws IOException{
 		long begin = System.currentTimeMillis();
 		
@@ -37,7 +33,7 @@ public class MongoQueryTest {
 		String destPath=System.getProperty("user.dir") + "/booksCache/";
 		String md5="testmd5"; ///need to find proper id later!!!
 		
-		downloadByMd5(db , md5, destPath, "testsavebook");
+		MongoQuery.downloadByMd5(db , md5, destPath, "testsavebook");
 		long end = System.currentTimeMillis();
 		
 		System.out.println("Total used " + (end - begin) + " msec");
@@ -48,7 +44,7 @@ public class MongoQueryTest {
 		
 		MongoDB mdb=new MongoDB("test");
 
-		searchByTitle(mdb.getCollection("books_meta"), "Peter Pan in Kensington Gardens");
+		MongoQuery.searchByTitle(mdb.getCollection("books_meta"), "Peter Pan in Kensington Gardens");
 		
 		long end = System.currentTimeMillis();
 		
@@ -56,19 +52,5 @@ public class MongoQueryTest {
 		
 	}
 	
-	//can be put into MongoDB class
-	public String searchByTitle(DBCollection metacollection, String bookTitle ){
-		DBObject obj = metacollection.findOne(new BasicDBObject("title", bookTitle));
-		String resultmd5=(String)obj.get("md5");
-		return resultmd5;
-	
-	}
-	
-	//can be put into MongoDB class
-	public void downloadByMd5(DB db, String bookmd5, String savePath, String saveName) throws IOException{
-		GridFS gfsBooks = new GridFS(db, "books");
-		GridFSDBFile imageForOutput = gfsBooks.findOne(new BasicDBObject("md5",bookmd5));
-		String newFile=savePath+saveName;
-		imageForOutput.writeTo(newFile); //output to new file
-	}
+
 }
