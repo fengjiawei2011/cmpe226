@@ -3,9 +3,12 @@ package cmpe226.project2.util;
 import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
@@ -25,6 +28,11 @@ public class MongoDB {
 			e.printStackTrace();
 		}
 	}
+	
+	public void deleteDB(){
+		client.dropDatabase(dbName);
+		System.out.println("drop db:" + dbName + " success");
+	}
 
 	public DBCollection getCollection(String collectionName) {
 		return client.getDB(dbName).getCollection(collectionName);
@@ -37,6 +45,7 @@ public class MongoDB {
 		return gfsFile.getMD5();
 	}
 	
+	// query by id
 	public boolean download(String fileId, String destPath) throws IOException{
 		GridFS gfsBooks = new GridFS(client.getDB(dbName), "books");
 		//gfsBooks.get
@@ -45,7 +54,23 @@ public class MongoDB {
 			file.writeTo(destPath);
 			return true;
 		}
-		
 		return false;
 	}
+	
+	public ArrayList<DBObject> searchByYears(DBCollection metacollection, String d){
+		DBCursor cursor = metacollection.find(new BasicDBObject("release_date", d));
+		ArrayList<DBObject> list = new ArrayList<DBObject>();
+		while(cursor.hasNext()){
+			list.add(cursor.next());
+		}
+		return list;
+	}
+	
+	public String searchByTitle(DBCollection metacollection, String bookTitle ){
+		DBObject obj = metacollection.findOne(new BasicDBObject("title", bookTitle));
+		String resultmd5=(String)obj.get("md5");
+		return resultmd5;
+	
+	}
+	
 }
