@@ -3,11 +3,11 @@ package cmpe226.project2.books.mongo.gridfs;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
@@ -17,21 +17,18 @@ public class MongoQuery {
 	/**
 	 * query1: 
 	 * search by title ,  
-	 * return all meta data and/or book file---  mongo is better
+	 * print all meta data, including comments---  mongo is better
 	 * 
 	 * @param metacollection
 	 * @param bookTitle
 	 * @return
 	 */
-	public static HashMap<String, String> searchByTitle(DBCollection metacollection, String bookTitle ){
+	public static void searchByTitle(DB db, String bookTitle ){
 		//TODO
-		DBObject obj = metacollection.findOne(new BasicDBObject("title", bookTitle));
+		DBCollection col = db.getCollection("books_meta");
+		DBObject obj = col.findOne(new BasicDBObject("title", bookTitle));
+		System.out.println(obj);
 		
-		
-		HashMap<String, String> result =new HashMap<String, String>();
-		
-		return result;
-	
 	}
 	
 	/**
@@ -43,23 +40,49 @@ public class MongoQuery {
 	 * @param authorName
 	 * @return
 	 */
-	public static ArrayList<String> searchByAuthor(DBCollection metacollection, String authorName ){
-		//TODO
+	public static ArrayList<String> searchByAuthor(DB db, String authorName ){
 		ArrayList<String> result=new ArrayList<String>();
+		
+		DBCollection col = db.getCollection("books_meta");
+		BasicDBObject query = new BasicDBObject("author", authorName);
+
+		DBCursor cursor = col.find(query);
+
+		while(cursor.hasNext())
+		{
+			DBObject obj=cursor.next();
+		   //System.out.println(obj);
+		   result.add(  (String)obj.get("md5")  ) ;
+		}
+		cursor.close();
+		
 		return result;
 	}
 	
 	/**
 	 * Query3
 	 * search book by specific language or group by language
+	 * return bookid of all found books
 	 * 
 	 * @param metacollection
 	 * @param language
 	 * @return
 	 */
-	public static ArrayList<String> searchByLanguage(DBCollection metacollection, String language ){
-		//TODO
+	public static ArrayList<String> searchByLanguage(DB db, String language ){
 		ArrayList<String> result=new ArrayList<String>();
+		DBCollection col = db.getCollection("books_meta");
+		BasicDBObject query = new BasicDBObject("language", language);
+
+		DBCursor cursor = col.find(query);
+
+		while(cursor.hasNext())
+		{
+			DBObject obj=cursor.next();
+		   //System.out.println(obj);
+		   result.add(  (String)obj.get("md5")  ) ;
+		}
+		cursor.close();
+		
 		return result;
 	}
 	
