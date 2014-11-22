@@ -32,8 +32,7 @@ public class BookDAO {
 	public void searchByTitle( String bookTitle ){
 		//TODO
 		DBObject obj = bookMatedata.findOne(new BasicDBObject("title", bookTitle));
-		System.out.println(obj);
-		
+		//System.out.println(obj);
 	}
 	
 	/**

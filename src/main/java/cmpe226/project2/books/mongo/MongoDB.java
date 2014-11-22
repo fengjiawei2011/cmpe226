@@ -54,7 +54,7 @@ public class MongoDB {
 			saveMeta(result, md5, mongoDB.getCollection(bookCollection));
 			count++;
 		}
-		System.out.println(count + " books parsed.");
+		//System.out.println(count + " books parsed.");
 	}
 
 	public DB getDB() {
@@ -64,7 +64,7 @@ public class MongoDB {
 	public boolean dbExist() {
 		ArrayList<String> dbs = (ArrayList<String>) client.getDatabaseNames();
 		for (String db : dbs) {
-			System.out.println(db);
+			//System.out.println(db);
 			if (db.equals(dbName)) {
 				return true;
 			}
@@ -86,14 +86,15 @@ public class MongoDB {
 		for(String key : map.keySet()){
 			obj.append(key, map.get(key));
 		}
-		System.out.println(obj);
 		mongoDB.getCollection(bookStatCollection).save(obj);
+		System.out.println(obj);
 	}
 
 	public void deleteDB() throws InterruptedException {
 		if (dbExist()) {
-			System.out.println("deleting old db first .......");
+			System.out.println("deleting old db first ...");
 			client.dropDatabase(dbName);
+			System.out.println("delete successful...");
 			return;
 		}
 		System.out.println("db not exist, start to crearting and loading...");

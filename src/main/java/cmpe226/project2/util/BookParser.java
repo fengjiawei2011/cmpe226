@@ -96,7 +96,7 @@ public class BookParser {
 				info.put(key, matcher.group(2).trim());
 			}
 			else {
-				System.out.println("[Abandon] " + key);
+				//System.out.println("[Abandon] " + key);
 			}
 			
 		} else if (!info.containsKey("release_date")) {

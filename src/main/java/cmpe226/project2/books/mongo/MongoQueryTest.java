@@ -7,10 +7,7 @@ import java.util.HashMap;
 
 import cmpe226.project2.books.mongo.gridfs.MongoQuery;
 
-import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 
 public class MongoQueryTest {
@@ -30,7 +27,9 @@ public class MongoQueryTest {
 	}
 
 	public static void main(String[] args) throws IOException {
-
+		
+		
+		System.out.println("program start...");
 		MongoQueryTest test = new MongoQueryTest();
 		try {
 			mongoDB.deleteDB();
@@ -50,9 +49,10 @@ public class MongoQueryTest {
 		mongoDB.saveStatistic(map);
 
 		// load ten time
-		map = testByDataSize(mongoDB, 10);
+		map = testByDataSize(mongoDB, 9);
 		mongoDB.saveStatistic(map);
-
+		
+		System.out.println("program end...");
 	}
 
 	public static HashMap<String, Long> testByDataSize(MongoDB db, int num)
@@ -71,6 +71,7 @@ public class MongoQueryTest {
 	}
 
 	private static long loadData(MongoDB db, int num) {
+		System.out.println("loading "+num+" times data...");
 		long begin = System.currentTimeMillis();
 		try {
 			for (int i = 0; i < num; i++) {
@@ -95,7 +96,7 @@ public class MongoQueryTest {
 		MongoQuery.downloadByMd5(db, md5, destPath, "testsavebook");
 		long end = System.currentTimeMillis();
 
-		System.out.println("Total used " + (end - begin) + " msec");
+		//System.out.println("Total used " + (end - begin) + " msec");
 
 		mongoClient.close();
 	}
@@ -108,14 +109,14 @@ public class MongoQueryTest {
 	public static long searchByTitleTest(String title)
 			throws UnknownHostException {
 		long begin = System.currentTimeMillis();
-		System.out.println("test for query1: search by title=========");
+		//System.out.println("test for query1: search by title=========");
 
 		// MongoQuery.searchByTitle(db, "Peter Pan in Kensington Gardens");
 		dao.searchByTitle(title);
 
 		long end = System.currentTimeMillis();
 
-		System.out.println("Total used " + (end - begin) + " msec");
+		//System.out.println("Total used " + (end - begin) + " msec");
 		return (end - begin);
 
 	}
@@ -132,7 +133,7 @@ public class MongoQueryTest {
 		ArrayList<String> result = dao.searchByAuthor(testauthor);
 		long end = System.currentTimeMillis();
 
-		System.out.println("Total used " + (end - begin) + " msec");
+		//System.out.println("Total used " + (end - begin) + " msec");
 		return (end - begin);
 	}
 
@@ -150,7 +151,7 @@ public class MongoQueryTest {
 
 		long end = System.currentTimeMillis();
 
-		System.out.println("Total used " + (end - begin) + " msec");
+		//System.out.println("Total used " + (end - begin) + " msec");
 		return (end - begin);
 	}
 
