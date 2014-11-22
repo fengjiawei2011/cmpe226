@@ -15,6 +15,7 @@ import java.util.UUID;
 
 import com.datastax.driver.core.BatchStatement;
 import com.datastax.driver.core.KeyspaceMetadata;
+import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.Statement;
@@ -72,11 +73,11 @@ public class DAO {
 				.format("CREATE TYPE IF NOT EXISTS %s.%s (book_id uuid, rating double, rate_date timestamp);",
 						keyspace, rateType);
 
-		// create book table with basic information
+		// create book table with basic information	
 		String createBookTable = String
 				.format("CREATE TABLE IF NOT EXISTS %s.%s (id uuid PRIMARY KEY, title text, author text, first_author text, release_date text, avg_rate double, count_rate int, comments set<frozen<%s>>, content blob);",
 						keyspace, bookTable, commentType);
-
+		
 		String createUserTable = String
 				.format("CREATE TABLE IF NOT EXISTS %s.%s (id uuid PRIMARY KEY, name text, read_books set<frozen<%s>>, write_books set<uuid>);",
 						keyspace, userTable, rateType);
@@ -84,12 +85,20 @@ public class DAO {
 		String createUserNameIndex = String
 				.format("CREATE INDEX IF NOT EXISTS user_name ON %s.%s (name);", keyspace, userTable);
 		
+		String createTitleIndex = String
+				.format("CREATE INDEX IF NOT EXISTS title ON %s.%s (title);", keyspace, bookTable);
+		
+		String createAuthorIndex = String
+				.format("CREATE INDEX IF NOT EXISTS author ON %s.%s (author);", keyspace, bookTable);
+		
 		session.execute(createKeyspace);
 		session.execute(createCommentType);
 		session.execute(createRateType);
 		session.execute(createBookTable);
 		session.execute(createUserTable);
 		session.execute(createUserNameIndex);
+		session.execute(createTitleIndex);
+		session.execute(createAuthorIndex);
 		
 		KeyspaceMetadata km = session.getCluster().getMetadata().getKeyspace(keyspace);
 		commentT = km.getUserType(commentType);
@@ -102,6 +111,18 @@ public class DAO {
 					keyspace, table, column, type);
 			session.execute(addCol);
 			System.out.println("[Add Column] " + column);
+		} catch (InvalidQueryException e) {
+			// ignore exception if the column already exists
+			return;
+		}
+	}
+	
+	public void addIndex(String table, String column) {
+		try {
+			String addIndex = String.format("CREATE INDEX IF NOT EXISTS %s ON %s.%s (%s);",
+					column, keyspace, table, column);
+			session.execute(addIndex);
+			System.out.println("[Add Index] " + column);
 		} catch (InvalidQueryException e) {
 			// ignore exception if the column already exists
 			return;
@@ -254,6 +275,55 @@ public class DAO {
 			System.out.println("[Book NOT Found]");
 		}
 	}
+	
+	/**
+	 * query1: 
+	 * search by title ,  
+	 * get all data -- 'Peter Pan in Kensington Gardens'
+	 */	
+	   public void searchByTitle() {
+		      ResultSet results = session.execute("select * from cmpe226.books where title='Peter Pan in Kensington Gardens';");
+
+		      System.out.println(String.format("%-25s\t%-30s\t%-20s\n%s", "author", "title", "release_date",
+		             "-------------------------+-----------------------------------------+--------------------"));
+		      for (Row row : results) {
+		         System.out.println(String.format("%-25s\t%-30s\t%-20s", row.getString("author"),
+		         row.getString("title"),  row.getString("release_date")));
+		      }
+		      System.out.println();
+		   }
+
+	/**
+	 * Query2
+	 * search by author, 
+	 * return book id of all books written by this author -- 'Walt Whitman'
+	 */
+	   public void searchByAuthor() {
+		      ResultSet results = session.execute("select id from cmpe226.books where author ='Walt Whitman';");
+
+		      System.out.println(String.format("%-20s\n%s", "id",
+		             "-------------------------"));
+		      for (Row row : results) {
+		         System.out.println(String.format("%-20s", row.getUUID("id")));
+		      }
+		      System.out.println();
+		   }
+   
+	/**
+	 * Query3
+	 * search book by specific language or group by language -- English
+	 * return bookid of all found books
+	 */
+	   public void searchByLanguage() {	   
+		      ResultSet results = session.execute("select id from cmpe226.books where language ='English';");
+
+		      System.out.println(String.format("%-20s\n%s", "id",
+		             "-------------------------"));
+		      for (Row row : results) {
+		         System.out.println(String.format("%-20s", row.getUUID("id")));
+		      }
+		      System.out.println();
+		   }
 
 	public static void main(String[] args) throws IOException, InterruptedException {
 		CassandraClient client = new CassandraClient("localhost");
