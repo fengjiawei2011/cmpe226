@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import cmpe226.project2.books.monogo.schema.Book;
+import cmpe226.project2.books.mongo.schema.Book;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;

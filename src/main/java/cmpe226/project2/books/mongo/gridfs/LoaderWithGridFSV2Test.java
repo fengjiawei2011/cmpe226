@@ -6,6 +6,8 @@ import java.io.IOException;
 
 import org.junit.Test;
 
+import cmpe226.project2.books.mongo.LoaderWithGridFSV2;
+
 public class LoaderWithGridFSV2Test {
 
 	@Test

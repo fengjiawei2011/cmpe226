@@ -1,4 +1,4 @@
-package cmpe226.project2.books.mongo.gridfs;
+package cmpe226.project2.books.mongo;
 
 import java.io.File;
 import java.io.IOException;
@@ -94,8 +94,6 @@ public class LoaderWithGridFSV2 {
 		//return gfsFile.getId();
 	}
 	
-	
-
 	public static void saveMeta(HashMap<String, String> metadata,
 								String md5, DBCollection metacollection){
 		

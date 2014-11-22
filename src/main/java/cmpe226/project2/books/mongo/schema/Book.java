@@ -1,4 +1,4 @@
-package cmpe226.project2.books.monogo.schema;
+package cmpe226.project2.books.mongo.schema;
 
 import java.util.ArrayList;
 
