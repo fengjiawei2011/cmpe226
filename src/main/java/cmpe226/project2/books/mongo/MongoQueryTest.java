@@ -52,6 +52,10 @@ public class MongoQueryTest {
 		map = testByDataSize(mongoDB, 9);
 		mongoDB.saveStatistic(map);
 		
+		// load 13 time
+		map = testByDataSize(mongoDB, 13);
+		mongoDB.saveStatistic(map);
+		
 		System.out.println("program end...");
 	}
 
@@ -71,7 +75,7 @@ public class MongoQueryTest {
 	}
 
 	private static long loadData(MongoDB db, int num) {
-		System.out.println("loading "+num+" times data...");
+		System.out.println("loading_"+num+"_times data : ");
 		long begin = System.currentTimeMillis();
 		try {
 			for (int i = 0; i < num; i++) {
