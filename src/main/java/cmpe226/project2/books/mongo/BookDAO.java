@@ -31,8 +31,13 @@ public class BookDAO {
 	 */
 	public void searchByTitle( String bookTitle ){
 		//TODO
-		DBObject obj = bookMatedata.findOne(new BasicDBObject("title", bookTitle));
-		//System.out.println(obj);
+		int count = 0;
+		DBCursor cursor = bookMatedata.find(new BasicDBObject("title", bookTitle));
+		while(cursor.hasNext()){
+			cursor.next();
+			count++;
+		}
+		System.out.println("searchByTitle has rows ----  " + count );
 	}
 	
 	/**
@@ -50,7 +55,8 @@ public class BookDAO {
 		BasicDBObject query = new BasicDBObject("author", authorName);
 
 		DBCursor cursor = bookMatedata.find(query);
-
+		
+	
 		while(cursor.hasNext())
 		{
 			DBObject obj=cursor.next();
@@ -58,7 +64,7 @@ public class BookDAO {
 		   result.add(  (String)obj.get("md5")  ) ;
 		}
 		cursor.close();
-		
+		System.out.println("searchByAuthor has rows ---  " + result.size());
 		return result;
 	}
 	
@@ -84,7 +90,7 @@ public class BookDAO {
 		   result.add(  (String)obj.get("md5")  ) ;
 		}
 		cursor.close();
-		
+		System.out.println("searchByLanguage has rows ---  " + result.size());
 		return result;
 	}	
 	

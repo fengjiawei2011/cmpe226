@@ -86,7 +86,7 @@ public class MongoDB {
 		for(String key : map.keySet()){
 			obj.append(key, map.get(key));
 		}
-		mongoDB.getCollection(bookStatCollection).save(obj);
+		//mongoDB.getCollection(bookStatCollection).save(obj);
 		System.out.println(obj);
 	}
 

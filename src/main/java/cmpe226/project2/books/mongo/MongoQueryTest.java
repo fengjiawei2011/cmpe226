@@ -57,6 +57,14 @@ public class MongoQueryTest {
 		mongoDB.saveStatistic(map);
 		
 		System.out.println("program end...");
+		
+		
+		try {
+			mongoDB.deleteDB();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public static HashMap<String, Long> testByDataSize(MongoDB db, int num)
@@ -66,6 +74,10 @@ public class MongoQueryTest {
 		Long queryByTitle = searchByTitleTest("Peter Pan in Kensington Gardens");
 		Long queryByAuthor = searchByAuthorTest("William Shakespeare");
 		Long queryByLang = searchByLanguageTest("English");
+		System.out.println("queryByTitle time = " + queryByTitle);
+		System.out.println("queryByAuthor time = " + queryByAuthor);
+		System.out.println("queryByLang time = " + queryByLang);
+		
 		HashMap<String, Long> map = new HashMap<String, Long>();
 		map.put("loading_" + num + "_times_data", loadData);
 		map.put("query_by_title", queryByTitle);
@@ -86,6 +98,7 @@ public class MongoQueryTest {
 			e.printStackTrace();
 		}
 		long end = System.currentTimeMillis();
+		System.out.print(  end - begin );
 		return end - begin;
 	}
 
