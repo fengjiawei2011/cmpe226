@@ -1,35 +1,39 @@
 package cmpe226.project2.books.cassandra;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+
+import com.datastax.driver.core.ResultSet;
 
 public class QueryTest {
 	
 	private DAO dao;
 	private HashMap<String, Long> result;
 	
-	public QueryTest() {
-		CassandraClient client = new CassandraClient("localhost");
+	public QueryTest(CassandraClient client) {
 		dao = new DAO(client.getSession());
 		result  = new HashMap<String, Long>();
 	}
 	
 	// Load books
-	public void loadBooks (int num,QueryTest test) throws IOException {
+	public void loadBooks (int num) throws IOException {
 		dao.recreateKeyspace();		
 		
+		int count = 0;
 		long begin = System.currentTimeMillis();
 		for(int i = 0; i < num; i++){
-			dao.loadData(System.getProperty("user.dir") + "/books/");
+			count += dao.loadData(System.getProperty("user.dir") + "/books/");
 		}
 		long end = System.currentTimeMillis();
 		
+		System.out.printf("%d books loaded.", count);
 		System.out.println("Total used " + (end - begin) + " msec");
 		result.put("loading_"+num+"_times_data", (end - begin));
 		
-		Long searchByTitle = test.querySearchByTitle();
-		Long searchByAuthor = test.querySearchByAuthor();
-		Long searchByLanguage = test.querySearchByLanguage();
+		Long searchByTitle = querySearchByTitle();
+		Long searchByAuthor = querySearchByAuthor();
+		Long searchByLanguage = querySearchByLanguage();
 		
 		result.put("querySearchByTitle_"+num+"_times_data",  searchByTitle);
 		result.put("querySearchByAuthor_"+num+"_times_data",  searchByAuthor);
@@ -43,10 +47,11 @@ public class QueryTest {
 		
 		long begin = System.currentTimeMillis();
 		
-		dao.searchByTitle();
+		ResultSet results = dao.searchByTitle("Peter Pan in Kensington Gardens");
 		
 		long end = System.currentTimeMillis();
 		
+		System.out.println("QuerySearchByTitle - Find " + results.all().size() + " books");
 		System.out.println("QuerySearchByTitle - total used " + (end - begin) + " msec");
 		return (end - begin);
 	}
@@ -56,10 +61,11 @@ public class QueryTest {
 
 		long begin = System.currentTimeMillis();
 		
-		dao.searchByAuthor();
+		ArrayList<String> result = dao.searchByAuthor("Walt Whitman");
 		
 		long end = System.currentTimeMillis();
 		
+		System.out.println("QuerySearchByAuthor - Find " + result.size() + " books");
 		System.out.println("QuerySearchByAuthor - total used " + (end - begin) + " msec");
 		return (end - begin);
 	}
@@ -67,33 +73,38 @@ public class QueryTest {
 	// Query 3
 	public Long querySearchByLanguage() {
 
-		dao.addIndex("books", "language");
-
 		long begin = System.currentTimeMillis();
 		
-		dao.searchByLanguage();
+		ArrayList<String> result = dao.searchByLanguage("English");
 		
 		long end = System.currentTimeMillis();
 		
-		System.out.println("querySearchByLanguage - total used " + (end - begin) + " msec");
+		System.out.println("QuerySearchByLanguage - Find " + result.size() + " books");
+		System.out.println("QuerySearchByLanguage - total used " + (end - begin) + " msec");
 		return (end - begin);
 	}
 		
 	public static void main(String[] args) throws IOException {
-		QueryTest test = new QueryTest();
+
+		CassandraClient client = new CassandraClient("localhost");
 		
-		test.loadBooks(1,test);
+		QueryTest test = new QueryTest(client);
 		
-		test.loadBooks(5,test);
+		test.loadBooks(1);
 		
-		test.loadBooks(9,test);
+		test.loadBooks(5);
 		
+		test.loadBooks(9);
+
+		test.loadBooks(13);
 		
 		System.out.println("*************results******************");
 		
 		for(String str : test.result.keySet()){
 			System.out.println(str+" : "+ test.result.get(str));
 		}
+		
+		client.close();
 	}
 	
 }
