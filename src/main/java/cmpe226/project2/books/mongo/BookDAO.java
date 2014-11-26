@@ -52,7 +52,7 @@ public class BookDAO {
 	public  ArrayList<String> searchByAuthor(String authorName ){
 		ArrayList<String> result=new ArrayList<String>();
 
-		BasicDBObject query = new BasicDBObject("author", authorName);
+		BasicDBObject query = new BasicDBObject("first_author", authorName);
 
 		DBCursor cursor = bookMatedata.find(query);
 		

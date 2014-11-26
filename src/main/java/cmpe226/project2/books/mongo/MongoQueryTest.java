@@ -12,7 +12,7 @@ import com.mongodb.MongoClient;
 
 public class MongoQueryTest {
 
-	static String FILES_PATH = "/Users/frank/Documents/projects/java/cmpe226/books/";
+	static String FILES_PATH = System.getProperty("user.dir") + "/books/";
 	static MongoDB mongoDB = null;
 	static BookDAO dao = null;
 

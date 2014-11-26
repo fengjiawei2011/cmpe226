@@ -92,7 +92,7 @@ public class DAO {
 				bookTable);
 
 		String createAuthorIndex = String.format(
-				"CREATE INDEX IF NOT EXISTS author ON %s.%s (author);",
+				"CREATE INDEX IF NOT EXISTS first_author ON %s.%s (first_author);",
 				keyspace, bookTable);
 
 		String createLanguageIndex = String.format(
@@ -324,7 +324,7 @@ public class DAO {
 	public ArrayList<String> searchByAuthor(String author) {
 		ArrayList<String> result = new ArrayList<String>();
 		ResultSet results = session
-				.execute("select id from cmpe226.books where author ='"
+				.execute("select id from cmpe226.books where first_author ='"
 						+ author + "';");
 		for (Row row : results) 
 			result.add(row.getUUID("id").toString());

@@ -61,7 +61,7 @@ public class QueryTest {
 
 		long begin = System.currentTimeMillis();
 		
-		ArrayList<String> result = dao.searchByAuthor("Walt Whitman");
+		ArrayList<String> result = dao.searchByAuthor("William Shakespeare");
 		
 		long end = System.currentTimeMillis();
 		
