@@ -57,6 +57,10 @@ public class DAO {
 		session.execute("DROP KEYSPACE " + keyspace);
 		init();
 	}
+	
+	public void dropDB(){
+		session.execute("DROP KEYSPACE " + keyspace);
+	}
 
 	// create keyspace and table
 	private void init() {

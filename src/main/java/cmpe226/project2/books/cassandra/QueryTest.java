@@ -90,20 +90,20 @@ public class QueryTest {
 		
 		QueryTest test = new QueryTest(client);
 		
-		test.loadBooks(1);
-		
-		test.loadBooks(5);
-		
-		test.loadBooks(9);
-
-		test.loadBooks(13);
+//		test.loadBooks(1);
+//		
+//		test.loadBooks(5);
+//		
+//		test.loadBooks(9);
+//
+//		test.loadBooks(13);
 		
 		System.out.println("*************results******************");
 		
 		for(String str : test.result.keySet()){
 			System.out.println(str+" : "+ test.result.get(str));
 		}
-		
+		test.dao.dropDB();
 		client.close();
 	}
 	
